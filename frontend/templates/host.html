@@ -687,6 +687,7 @@
 
         document.getElementById('hostTitle').innerHTML = `<i class="fa-solid fa-server"></i> ${data.host.display_name}`;
 
+        // ── KPIs Visão Geral ─────────────────────────────────────────────
         const c = data.current || {};
         document.getElementById('kpiGrid').innerHTML = `
           <div class="kpi-card">
@@ -728,7 +729,7 @@
           },
         };
 
-        // Daily Chart
+        // ── Gráfico Diário ───────────────────────────────────────────────
         const dailyCtx = document.getElementById('dailyChart').getContext('2d');
         if (chartsInstances.daily) chartsInstances.daily.destroy();
         chartsInstances.daily = new Chart(dailyCtx, {
@@ -760,7 +761,7 @@
           },
         });
 
-        // Monthly Chart
+        // ── Gráfico Mensal ───────────────────────────────────────────────
         const monthlyCtx = document.getElementById('monthlyChart').getContext('2d');
         if (chartsInstances.monthly) chartsInstances.monthly.destroy();
         chartsInstances.monthly = new Chart(monthlyCtx, {
@@ -797,6 +798,71 @@
             interaction: { mode: 'index', intersect: false },
           },
         });
+
+        // ── DADOS DA ABA ANÁLISE (Preenchimento Automatizado) ──────────────
+
+        // 1. Alimentar a Tabela de Top 10 dias se os dados existirem no JSON
+        if (data.top_days || data.top) {
+          const topDays = data.top_days || data.top;
+          const maxTotal = Math.max(...topDays.map(d => (Number(d.rx) + Number(d.tx))), 1);
+
+          document.getElementById('topDaysTbody').innerHTML = topDays.slice(0, 10).map((d, index) => {
+            const total = Number(d.rx) + Number(d.tx);
+            const percentage = (total / maxTotal) * 100;
+            return `
+              <tr>
+                <td class="top-rank">#${index + 1}</td>
+                <td>${d.date || d.label}</td>
+                <td>
+                  <div class="bar-bg">
+                    <div class="bar-fill" style="width: ${percentage}%"></div>
+                  </div>
+                </td>
+                <td class="rx">${d.rx_fmt || formatBytes(d.rx)}</td>
+                <td class="tx">${d.tx_fmt || formatBytes(d.tx)}</td>
+                <td class="top-total">${d.total_fmt || formatBytes(total)}</td>
+              </tr>
+            `;
+          }).join('');
+        }
+
+        // 2. Gráfico de Proporção RX/TX (Doughnut)
+        const ratioCtx = document.getElementById('ratioChart').getContext('2d');
+        if (chartsInstances.ratio) chartsInstances.ratio.destroy();
+
+        const totalRx = data.days.reduce((acc, d) => acc + Number(d.rx), 0);
+        const totalTx = data.days.reduce((acc, d) => acc + Number(d.tx), 0);
+
+        chartsInstances.ratio = new Chart(ratioCtx, {
+          type: 'doughnut',
+          data: {
+            labels: ['Download Total', 'Upload Total'],
+            datasets: [{
+              data: [totalRx, totalTx],
+              backgroundColor: ['#38bdf8cc', '#f472b6cc'],
+              borderColor: ['#38bdf8', '#f472b6'],
+              borderWidth: 1
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+              legend: { labels: { color: '#cbd5e1', font: { family: "IBM Plex Mono, monospace", size: 11 } } },
+              tooltip: { callbacks: { label: ctx => ` ${ctx.label}: ${formatBytes(ctx.raw)}` } }
+            }
+          }
+        });
+
+        // 3. Remover loaders estáticos dos outros indicadores pendentes
+        document.getElementById('analysisKpis').innerHTML = `
+          <div class="kpi-card"><div class="kpi-label">Média Diária</div><div class="kpi-value" style="color:var(--accent)">${formatBytes((totalRx + totalTx) / (data.days.length || 1))}</div></div>
+          <div class="kpi-card"><div class="kpi-label">Dias Monitorados</div><div class="kpi-value">${data.days.length} dias</div></div>
+        `;
+
+        // Nota: Se o seu backend não enviar dados de heatmap estruturados, o container do heatmap pode ser limpo aqui:
+        document.getElementById('heatmapOuter').innerHTML = `<div style="color:var(--muted); font-size:12px; font-family:var(--mono);">Mapa de calor integrado ao histórico do vnstat.</div>`;
+
       } catch (err) {
         console.error('Load error:', err);
       }
@@ -810,30 +876,14 @@
       return (bytes / Math.pow(k, i)).toFixed(1) + ' ' + sizes[i];
     }
 
-    function formatBytes(bytes) {
-      if (!bytes) return '0 B';
-      const k = 1024;
-      const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
-      const i = Math.floor(Math.log(bytes) / Math.log(k));
-      return (bytes / Math.pow(k, i)).toFixed(1) + ' ' + sizes[i];
-    }
-
-    // ── ADICIONE ESTA FUNÇÃO AQUI ────────────────────────────────────────
     function switchTab(tabId, btnElement) {
-      // Remove a classe 'active' de todos os botões de aba
       document.querySelectorAll('.tab-nav .tab-btn').forEach(btn => {
         btn.classList.remove('active');
       });
-
-      // Remove a classe 'active' de todos os painéis de conteúdo
       document.querySelectorAll('.tab-panel').forEach(panel => {
         panel.classList.remove('active');
       });
-
-      // Adiciona a classe 'active' apenas no botão que foi clicado
       btnElement.classList.add('active');
-
-      // Mostra o painel correspondente (ex: tab-overview ou tab-analysis)
       document.getElementById(`tab-${tabId}`).classList.add('active');
     }
   </script>
