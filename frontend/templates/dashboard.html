@@ -1,22 +1,33 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>vnstat — Dashboard</title>
   <link rel="icon" type="image/x-icon" href="/favicon.ico?v=1">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <link
+    href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
     :root {
       --bg: #0a0e14;
       --surface: #0f1520;
       --surface2: #151d2b;
       --border: #1e293b;
       --accent: #38bdf8;
-      --accent2: #22d3ee;
+      --accent2: #34d399;
       --accent3: #818cf8;
       --text: #e2e8f0;
       --text-dim: #cbd5e1;
@@ -27,9 +38,8 @@
       --sans: 'Inter', sans-serif;
     }
 
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    html, body {
+    html,
+    body {
       height: 100%;
       background: var(--bg);
       color: var(--text);
@@ -41,13 +51,16 @@
       flex-direction: column;
     }
 
+    /* Grid background */
     body::before {
       content: '';
       position: fixed;
       inset: 0;
-      background-image: linear-gradient(var(--border) 1px, transparent 1px), linear-gradient(90deg, var(--border) 1px, transparent 1px);
+      background-image:
+        linear-gradient(var(--border) 1px, transparent 1px),
+        linear-gradient(90deg, var(--border) 1px, transparent 1px);
       background-size: 40px 40px;
-      opacity: 0.25;
+      opacity: 0.3;
       pointer-events: none;
       z-index: 0;
     }
@@ -56,7 +69,7 @@
       content: '';
       position: fixed;
       inset: 0;
-      background: radial-gradient(ellipse 120% 80% at 50% 20%, rgba(56, 189, 248, 0.08) 0%, transparent 70%);
+      background: radial-gradient(ellipse 100% 80% at 50% 0%, #0f172a44 0%, transparent 60%);
       pointer-events: none;
       z-index: 0;
     }
@@ -64,8 +77,7 @@
     header {
       position: relative;
       z-index: 10;
-      background: rgba(15, 21, 32, 0.95);
-      backdrop-filter: blur(12px);
+      background: var(--surface);
       border-bottom: 1px solid var(--border);
       padding: 16px 24px;
       display: flex;
@@ -79,151 +91,297 @@
       align-items: center;
       gap: 12px;
       font-family: var(--mono);
-      font-size: 17px;
-      font-weight: 600;
+      font-size: 16px;
+      font-weight: 500;
     }
 
     .header-logo-icon {
-      width: 36px;
-      height: 36px;
+      width: 32px;
+      height: 32px;
       background: linear-gradient(135deg, var(--accent), var(--accent3));
-      border-radius: 10px;
+      border-radius: 8px;
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 4px 12px rgba(56, 189, 248, 0.3);
+    }
+
+    .header-logo-icon svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    .header-logo span {
+      color: var(--accent);
     }
 
     .header-right {
       display: flex;
       align-items: center;
-      gap: 18px;
+      gap: 16px;
     }
 
     .user-badge {
-      font-size: 13px;
+      font-size: 12px;
       color: var(--muted);
       font-family: var(--mono);
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
     }
 
     .btn-logout {
-      padding: 9px 16px;
+      padding: 8px 14px;
       background: transparent;
       border: 1px solid var(--border);
-      border-radius: 8px;
+      border-radius: 6px;
       color: var(--text);
-      font-size: 13px;
+      font-size: 12px;
       font-weight: 500;
       font-family: var(--mono);
       cursor: pointer;
-      transition: all 0.2s;
+      transition: all .2s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
 
     .btn-logout:hover {
-      border-color: #f87171;
-      color: #fda4af;
+      border-color: var(--muted);
+      color: var(--text-dim);
     }
 
     main {
       position: relative;
       z-index: 1;
       flex: 1;
-      padding: 28px;
-      max-width: 1480px;
+      padding: 24px;
+      max-width: 1400px;
       margin: 0 auto;
       width: 100%;
       overflow-y: auto;
     }
 
     .section-title {
-      font-size: 13.5px;
+      font-size: 14px;
       font-weight: 600;
       text-transform: uppercase;
-      letter-spacing: 0.12em;
+      letter-spacing: 0.1em;
       color: var(--muted);
-      margin: 36px 0 18px;
+      margin-bottom: 16px;
       font-family: var(--mono);
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .kpi-grid, .hosts-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 16px;
-      margin-bottom: 32px;
-    }
-
-    .hosts-grid { grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); }
-
-    .kpi-card, .host-card {
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 20px;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    .kpi-card:hover, .host-card:hover {
-      border-color: var(--accent);
-      transform: translateY(-4px);
-      box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1);
-    }
-
-    .kpi-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-    .kpi-label { font-size: 12px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); font-family: var(--mono); }
-    .kpi-value { font-size: 28px; font-weight: 600; font-family: var(--mono); letter-spacing: -0.04em; }
-    .kpi-value.rx { color: var(--rx); }
-    .kpi-value.tx { color: var(--tx); }
-
-    .charts-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(520px, 1fr));
-      gap: 20px;
-    }
-
-    .chart-card, .peak-card {
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 24px;
-    }
-
-    .chart-title, .peak-title {
-      font-size: 15px;
-      font-weight: 600;
-      margin-bottom: 20px;
-      font-family: var(--mono);
-      color: var(--text-dim);
       display: flex;
       align-items: center;
       gap: 8px;
     }
 
-    canvas { max-height: 340px; }
+    /* ── KPI Cards ──────────────────────────────────────────────────── */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 12px;
+      margin-bottom: 32px;
+    }
 
-    footer {
+    .kpi-card {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      transition: all .2s;
       position: relative;
-      z-index: 10;
-      background: rgba(15, 21, 32, 0.95);
-      backdrop-filter: blur(12px);
-      border-top: 1px solid var(--border);
-      padding: 14px 28px;
-      font-size: 12.5px;
-      color: var(--muted);
-      font-family: var(--mono);
+    }
+
+    .kpi-card:hover {
+      border-color: var(--accent);
+      box-shadow: 0 0 20px rgba(56, 189, 248, 0.15);
+    }
+
+    .kpi-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      flex-shrink: 0;
+      margin-bottom: 8px;
     }
 
-    .load-time { font-weight: 500; }
+    .kpi-label {
+      font-size: 11px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      font-family: var(--mono);
+    }
 
+    .kpi-icon {
+      font-size: 14px;
+      color: var(--muted);
+    }
+
+    .kpi-card:hover .kpi-icon {
+      color: var(--accent);
+    }
+
+    .kpi-value {
+      font-size: 24px;
+      font-weight: 600;
+      font-family: var(--mono);
+      margin-bottom: 4px;
+      letter-spacing: -0.5px;
+    }
+
+    .kpi-subtext {
+      font-size: 12px;
+      color: var(--text-dim);
+      font-family: var(--mono);
+    }
+
+    .kpi-live {
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+
+      0%,
+      100% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: .7;
+      }
+    }
+
+    /* ── Host Cards ─────────────────────────────────────────────────── */
+    .hosts-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+
+    .host-card {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      cursor: pointer;
+      transition: all .2s;
+    }
+
+    .host-card:hover {
+      border-color: var(--accent);
+      box-shadow: 0 0 30px rgba(56, 189, 248, 0.2);
+    }
+
+    .host-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .host-title-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .host-icon {
+      font-size: 14px;
+      color: var(--muted);
+    }
+
+    .host-card:hover .host-icon {
+      color: var(--accent);
+    }
+
+    .host-name {
+      font-size: 15px;
+      font-weight: 600;
+      font-family: var(--mono);
+    }
+
+    .host-status {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      animation: pulse-dot 2s ease-in-out infinite;
+    }
+
+    .host-status.online {
+      background: #34d399;
+    }
+
+    .host-status.offline {
+      background: var(--muted);
+    }
+
+    @keyframes pulse-dot {
+
+      0%,
+      100% {
+        opacity: 1;
+        box-shadow: 0 0 0 0 currentColor;
+      }
+
+      50% {
+        opacity: .7;
+      }
+    }
+
+    .host-stat {
+      margin-bottom: 12px;
+    }
+
+    .host-stat-label {
+      font-size: 11px;
+      color: var(--muted);
+      font-family: var(--mono);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .host-stat-value {
+      font-size: 14px;
+      font-weight: 600;
+      font-family: var(--mono);
+      margin-top: 3px;
+    }
+
+    .host-stat-value.rx {
+      color: var(--rx);
+    }
+
+    .host-stat-value.tx {
+      color: var(--tx);
+    }
+
+    /* ── Charts ────────────────────────────────────────────────────── */
+    .charts-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+      gap: 16px;
+    }
+
+    .chart-card {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+    }
+
+    .chart-title {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 16px;
+      font-family: var(--mono);
+    }
+
+    canvas {
+      max-height: 300px;
+    }
+
+    /* ── Loading ────────────────────────────────────────────────────── */
     .loading {
       display: flex;
       align-items: center;
@@ -231,32 +389,50 @@
       gap: 12px;
       color: var(--muted);
       font-family: var(--mono);
-      font-size: 13px;
-      padding: 80px 0;
+      font-size: 12px;
     }
 
     .spinner {
-      width: 18px;
-      height: 18px;
-      border: 2.5px solid var(--border);
+      width: 16px;
+      height: 16px;
+      border: 2px solid var(--border);
       border-top-color: var(--accent);
       border-radius: 50%;
-      animation: spin 0.8s linear infinite;
+      animation: spin .6s linear infinite;
     }
 
-    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
 
+    /* ── Responsive ─────────────────────────────────────────────────── */
     @media (max-width: 768px) {
-      main { padding: 16px; }
-      .charts-grid { grid-template-columns: 1fr; }
+      main {
+        padding: 16px;
+      }
+
+      .charts-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .kpi-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .hosts-grid {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
+
 <body>
   <header>
     <div class="header-logo">
       <div class="header-logo-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5" stroke-linecap="round">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2" stroke-linecap="round">
           <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
         </svg>
       </div>
@@ -271,26 +447,24 @@
   <main>
     <div class="section-title"><i class="fa-solid fa-chart-pie"></i> Agregado Total</div>
     <div class="kpi-grid" id="kpiGrid">
-      <div class="loading"><div class="spinner"></div> Carregando...</div>
+      <div class="loading">
+        <div class="spinner"></div> Carregando...
+      </div>
     </div>
 
-    <div class="section-title"><i class="fa-solid fa-network-wired"></i> Hosts</div>
+    <div class="section-title" style="margin-top: 32px;"><i class="fa-solid fa-network-wired"></i> Hosts</div>
     <div class="hosts-grid" id="hostsGrid">
-      <div class="loading"><div class="spinner"></div> Carregando...</div>
+      <div class="loading">
+        <div class="spinner"></div> Carregando...
+      </div>
     </div>
 
-    <div class="section-title"><i class="fa-solid fa-chart-line"></i> Gráficos</div>
+    <div class="section-title" style="margin-top: 32px;"><i class="fa-solid fa-chart-line"></i> Gráficos</div>
     <div class="charts-grid">
       <div class="chart-card">
         <div class="chart-title">Últimos 30 dias (por host)</div>
         <canvas id="dailyChart"></canvas>
       </div>
-
-      <div class="peak-card">
-        <div class="peak-title"><i class="fa-solid fa-fire"></i> Top 10 Picos de Tráfego</div>
-        <canvas id="peaksChart"></canvas>
-      </div>
-
       <div class="chart-card">
         <div class="chart-title">Últimos 12 meses (agregado)</div>
         <canvas id="monthlyChart"></canvas>
@@ -298,27 +472,17 @@
     </div>
   </main>
 
-  <footer>
-    <div>vnstat • Monitoramento em tempo real</div>
-    <div class="load-time" id="loadTime">Carregado em — ms</div>
-    <div>Auto-refresh • 30s</div>
-  </footer>
-
   <script>
     let dailyChartInstance = null;
     let monthlyChartInstance = null;
-    let peaksChartInstance = null;
-    let startTime = performance.now();
 
+    // ── Init ────────────────────────────────────────────────────────────
     document.addEventListener('DOMContentLoaded', () => {
       loadUser();
       loadOverview();
       loadCharts();
-      setInterval(() => {
-        startTime = performance.now();
-        loadOverview();
-        loadCharts();
-      }, 30000);
+      // Refresh every 30 seconds
+      setInterval(loadOverview, 30000);
     });
 
     async function loadUser() {
@@ -337,93 +501,184 @@
         const res = await fetch('/api/overview');
         const data = await res.json();
 
-        document.getElementById('kpiGrid').innerHTML = `
+        const kpiGrid = document.getElementById('kpiGrid');
+        kpiGrid.innerHTML = `
           <div class="kpi-card">
-            <div class="kpi-header"><div class="kpi-label">Total Recebido</div><i class="fa-solid fa-cloud-arrow-down kpi-icon"></i></div>
+            <div class="kpi-header">
+              <div class="kpi-label">Total Recebido (cumulative)</div>
+              <i class="fa-solid fa-cloud-arrow-down kpi-icon"></i>
+            </div>
             <div class="kpi-value">${data.total_rx_fmt}</div>
+            <div class="kpi-subtext">${formatBytes(data.total_rx)}</div>
           </div>
           <div class="kpi-card">
-            <div class="kpi-header"><div class="kpi-label">Total Enviado</div><i class="fa-solid fa-cloud-arrow-up kpi-icon"></i></div>
+            <div class="kpi-header">
+              <div class="kpi-label">Total Enviado (cumulative)</div>
+              <i class="fa-solid fa-cloud-arrow-up kpi-icon"></i>
+            </div>
             <div class="kpi-value">${data.total_tx_fmt}</div>
+            <div class="kpi-subtext">${formatBytes(data.total_tx)}</div>
           </div>
           <div class="kpi-card">
-            <div class="kpi-header"><div class="kpi-label">Total Mês</div><i class="fa-solid fa-calendar-days kpi-icon"></i></div>
+            <div class="kpi-header">
+              <div class="kpi-label">Total Mês</div>
+              <i class="fa-solid fa-calendar-days kpi-icon"></i>
+            </div>
             <div class="kpi-value">${data.month_rx_fmt}</div>
             <div class="kpi-subtext">↓ + ${data.month_tx_fmt} ↑</div>
           </div>
         `;
 
-        document.getElementById('hostsGrid').innerHTML = data.hosts.map(h => `
+        // Host cards
+        const hostsGrid = document.getElementById('hostsGrid');
+        hostsGrid.innerHTML = data.hosts.map(h => `
           <div class="host-card" onclick="goToHost('${h.name}')">
             <div class="host-card-header">
               <div class="host-title-wrapper">
                 <i class="fa-solid fa-server host-icon"></i>
                 <div class="host-name">${h.display_name}</div>
               </div>
-              <div class="host-status ${h.online ? 'online' : 'offline'}"></div>
+              <div class="host-status ${h.online ? 'online' : 'offline'}" title="${h.online ? 'Online' : 'Offline'}"></div>
             </div>
-            <div class="host-stat"><div class="host-stat-label">Recebido Total</div><div class="host-stat-value rx">${h.rx_total_fmt}</div></div>
-            <div class="host-stat"><div class="host-stat-label">Enviado Total</div><div class="host-stat-value tx">${h.tx_total_fmt}</div></div>
+            <div class="host-stat">
+              <div class="host-stat-label">Recebido Total</div>
+              <div class="host-stat-value rx">${h.rx_total_fmt}</div>
+            </div>
+            <div class="host-stat">
+              <div class="host-stat-label">Enviado Total</div>
+              <div class="host-stat-value tx">${h.tx_total_fmt}</div>
+            </div>
           </div>
         `).join('');
-
-        updateLoadTime();
       } catch (err) {
         console.error('loadOverview:', err);
       }
     }
 
+    async function apiFetch(url) {
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error(`Erro na requisição (${response.status}): ${response.statusText}`);
+      }
+      return response.json();
+    }
+
     async function loadCharts() {
-      startTime = performance.now();
       try {
-        const [daily, monthly, peaks] = await Promise.all([
-          fetch('/api/chart/daily?days=30').then(r => r.json()),
-          fetch('/api/chart/monthly').then(r => r.json()),
-          fetch('/api/chart/peaks').then(r => r.json())
+        const [daily, monthly] = await Promise.all([
+          apiFetch('/api/chart/daily?days=30'),
+          apiFetch('/api/chart/monthly'),
         ]);
 
-        // Daily Chart
-        if (dailyChartInstance) dailyChartInstance.destroy();
-        dailyChartInstance = new Chart(document.getElementById('dailyChart'), { /* ... seu código original ... */ });
-
-        // Monthly Chart
-        if (monthlyChartInstance) monthlyChartInstance.destroy();
-        monthlyChartInstance = new Chart(document.getElementById('monthlyChart'), { /* ... seu código original ... */ });
-
-        // Peaks Chart
-        if (peaksChartInstance) peaksChartInstance.destroy();
-        const peaksCtx = document.getElementById('peaksChart').getContext('2d');
-        peaksChartInstance = new Chart(peaksCtx, {
-          type: 'bar',
-          data: {
-            labels: peaks.map(p => p.date),
-            datasets: [
-              { label: 'Download (↓)', data: peaks.map(p => p.rx), backgroundColor: '#f87171cc', borderColor: '#ef4444', borderWidth: 1.5, borderRadius: 4 },
-              { label: 'Upload (↑)', data: peaks.map(p => p.tx), backgroundColor: '#fb923ccc', borderColor: '#f59e0b', borderWidth: 1.5, borderRadius: 4 }
-            ]
-          },
-          options: {
-            responsive: true,
-            plugins: {
-              legend: { labels: { color: '#cbd5e1', font: { family: 'IBM Plex Mono', size: 12 } } },
-              tooltip: { callbacks: { label: ctx => `${ctx.dataset.label}: ${formatBytes(ctx.parsed.y)}` } }
+        const baseOpts = (type) => ({
+          responsive: true,
+          maintainAspectRatio: true,
+          interaction: { mode: 'index', intersect: false },
+          plugins: {
+            legend: { labels: { color: '#cbd5e1', font: { family: 'IBM Plex Mono, monospace', size: 11 }, padding: 16, usePointStyle: true } },
+            tooltip: {
+              backgroundColor: '#0f172a', borderColor: '#38bdf8', borderWidth: 1,
+              titleFont: { family: 'IBM Plex Mono, monospace', size: 12 },
+              bodyFont: { family: 'IBM Plex Mono, monospace', size: 11 },
+              callbacks: { label: ctx => ctx.dataset.label + ': ' + formatBytes(ctx.parsed.y) },
             },
-            scales: {
-              x: { grid: { color: '#1e293b' }, ticks: { color: '#64748b', font: { family: 'IBM Plex Mono', size: 11 } } },
-              y: { grid: { color: '#1e293b' }, ticks: { color: '#64748b', font: { family: 'IBM Plex Mono', size: 11 }, callback: v => formatBytes(v) } }
-            }
-          }
+          },
+          scales: {
+            x: { grid: { color: '#1e293b' }, ticks: { color: '#64748b', maxTicksLimit: 10, font: { family: 'IBM Plex Mono, monospace', size: 10 } } },
+            y: { grid: { color: '#1e293b' }, ticks: { color: '#64748b', font: { family: 'IBM Plex Mono, monospace', size: 10 }, callback: v => formatBytes(v) } },
+          },
         });
 
-        updateLoadTime();
+        // ── Daily chart ──────────────────────────────────────────────────
+        if (!daily.labels || daily.labels.length === 0) {
+          showEmptyChart('dailyChart', 'Aguardando dados (próximos ciclos do coletor)');
+        } else {
+          const dailyCtx = document.getElementById('dailyChart').getContext('2d');
+          if (dailyChartInstance) dailyChartInstance.destroy();
+
+          const RX_COLORS = ['#38bdf8', '#34d399', '#a78bfa'];
+          const TX_COLORS = ['#f472b6', '#fb923c', '#facc15'];
+
+          const hostNames = [...new Set(daily.datasets.map(d => d.host))];
+          const cleanDatasets = [];
+
+          hostNames.forEach((host, i) => {
+            const rxDs = daily.datasets.find(d => d.host === host && d.type === 'rx');
+            const txDs = daily.datasets.find(d => d.host === host && d.type === 'tx');
+
+            if (rxDs) cleanDatasets.push({
+              label: rxDs.label,
+              data: rxDs.data.map(Number),
+              backgroundColor: RX_COLORS[i % RX_COLORS.length] + 'cc',
+              borderColor: RX_COLORS[i % RX_COLORS.length],
+              borderRadius: 3, borderWidth: 1,
+            });
+            if (txDs) cleanDatasets.push({
+              label: txDs.label,
+              data: txDs.data.map(Number),
+              backgroundColor: TX_COLORS[i % TX_COLORS.length] + 'cc',
+              borderColor: TX_COLORS[i % TX_COLORS.length],
+              borderRadius: 3, borderWidth: 1,
+            });
+          });
+
+          dailyChartInstance = new Chart(dailyCtx, {
+            type: 'bar',
+            data: { labels: daily.labels, datasets: cleanDatasets },
+            options: baseOpts('bar'),
+          });
+        }
+
+        // ── Monthly chart ────────────────────────────────────────────────
+        if (!monthly.labels || monthly.labels.length === 0) {
+          showEmptyChart('monthlyChart', 'Aguardando dados mensais');
+        } else {
+          const monthlyCtx = document.getElementById('monthlyChart').getContext('2d');
+          if (monthlyChartInstance) monthlyChartInstance.destroy();
+
+          const M_COLORS = ['#38bdf8', '#34d399', '#a78bfa'];
+          const cleanMonthly = [];
+
+          monthly.datasets.forEach((ds, i) => {
+            const c = M_COLORS[i % M_COLORS.length];
+            cleanMonthly.push({
+              label: ds.label + ' ↓',
+              data: (ds.rx || []).map(Number),
+              borderColor: c, backgroundColor: c + '33',
+              borderWidth: 2, tension: 0.4, fill: true,
+              pointRadius: 4, pointHoverRadius: 6,
+            });
+            cleanMonthly.push({
+              label: ds.label + ' ↑',
+              data: (ds.tx || []).map(Number),
+              borderColor: c + 'aa', backgroundColor: 'transparent',
+              borderWidth: 1.5, tension: 0.4, fill: false, borderDash: [4, 3],
+              pointRadius: 3, pointHoverRadius: 5,
+            });
+          });
+
+          monthlyChartInstance = new Chart(monthlyCtx, {
+            type: 'line',
+            data: { labels: monthly.labels, datasets: cleanMonthly },
+            options: baseOpts('line'),
+          });
+        }
       } catch (err) {
         console.error('[charts] ERRO:', err);
       }
     }
 
-    function updateLoadTime() {
-      const loadTime = (performance.now() - startTime).toFixed(0);
-      document.getElementById('loadTime').innerHTML = `Carregado em <strong>${loadTime}</strong> ms`;
+    function showEmptyChart(canvasId, msg) {
+      const canvas = document.getElementById(canvasId);
+      const parent = canvas.parentElement;
+      canvas.style.display = 'none';
+      if (!parent.querySelector('.empty-msg')) {
+        const el = document.createElement('div');
+        el.className = 'empty-msg';
+        el.style.cssText = 'display:flex;align-items:center;justify-content:center;height:200px;color:#64748b;font-family:var(--mono);font-size:13px;gap:8px;';
+        el.innerHTML = `<i class="fa-solid fa-circle-exclamation"></i> ${msg}`;
+        parent.appendChild(el);
+      }
     }
 
     function formatBytes(bytes) {
@@ -434,12 +689,18 @@
       return (bytes / Math.pow(k, i)).toFixed(1) + ' ' + sizes[i];
     }
 
-    function goToHost(name) { window.location.href = `/host/${name}`; }
+    function goToHost(name) {
+      window.location.href = `/host/${name}`;
+    }
 
     async function doLogout() {
-      await fetch('/api/auth/logout', { method: 'POST' });
-      window.location.href = '/login';
+      try {
+        await fetch('/api/auth/logout', { method: 'POST' });
+      } finally {
+        window.location.href = '/login';
+      }
     }
   </script>
 </body>
+
 </html>
