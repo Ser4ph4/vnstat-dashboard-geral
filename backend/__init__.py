@@ -2,7 +2,7 @@
 Author: Ser4ph4
 Date: 2026-06-13 04:58:27
 LastEditors: Ser4ph4
-LastEditTime: 2026-06-13 14:24:56
+LastEditTime: 2026-06-13 14:29:42
 '''
 from __future__ import annotations
 import os
@@ -55,14 +55,15 @@ def create_app(config_override: dict | None = None) -> Flask:
     app.register_blueprint(collector_bp, url_prefix="/api/collector")
     app.register_blueprint(pages_bp)
 
-@app.route('/favicon.svg')
+    # ── ROTA EXPLÍCITA DO FAVICON ATUALIZADA PARA SVG ─────────────────────
+    @app.route('/favicon.svg')
     def favicon():
         return send_from_directory(
             os.path.join(app.root_path, 'static'),
             'favicon.svg', 
             mimetype='image/svg+xml'
         )
-
+        
     # ── First-run seed ────────────────────────────────────────────────────
     with app.app_context():
         db.create_all()
