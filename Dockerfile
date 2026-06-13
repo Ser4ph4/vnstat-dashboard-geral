@@ -18,4 +18,4 @@ COPY . .
 EXPOSE 5000
 
 # Run with Gunicorn (Corrigido para 1 worker e porta 5000)
-CMD ["gunicorn", "--bind", "0.0.0.0:5000", "--workers", "1", "--worker-class", "sync", "--timeout", "30", "wsgi:app"]
+CMD ["gunicorn", "--bind", "0.0.0.0:5000", "--workers", "4", "--threads", "2", "--worker-class", "gthread", "--timeout", "30", "wsgi:app"]
