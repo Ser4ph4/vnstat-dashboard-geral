@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch: # Permite que você clique num botão para rodar o build quando quiser
 
 jobs:
   build-and-push:
@@ -16,7 +17,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up QEMU (Para build multi-arquitetura)
+      - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
 
       - name: Set up Docker Buildx
@@ -34,6 +35,5 @@ jobs:
         with:
           context: .
           push: true
-          # Builda para Intel/AMD e também para o seu servidor Oracle ARM
           platforms: linux/amd64,linux/arm64
           tags: ghcr.io/${{ github.repository_owner }}/vnstat-dashboard-geral:latest
