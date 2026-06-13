@@ -8,7 +8,7 @@
   <link rel="icon" type="image/x-icon" href="/favicon.ico?v=1">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link
-    href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@400;500;600&display=swap"
+    href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap"
     rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
@@ -23,28 +23,24 @@
 
     :root {
       --bg: #0a0e14;
-      --surface: #0d1117;
-      --surface2: #111827;
-      --surface3: #1a2233;
+      --surface: #0f1520;
+      --surface2: #151d2b;
       --border: #1e293b;
-      --border-subtle: #162032;
       --accent: #38bdf8;
       --accent2: #34d399;
       --accent3: #818cf8;
-      --accent-glow: rgba(56, 189, 248, 0.12);
       --text: #e2e8f0;
-      --text-dim: #94a3b8;
-      --muted: #475569;
+      --text-dim: #cbd5e1;
+      --muted: #64748b;
       --rx: #38bdf8;
       --tx: #f472b6;
       --mono: 'IBM Plex Mono', monospace;
       --sans: 'Inter', sans-serif;
-      --radius: 10px;
     }
 
     html,
     body {
-      min-height: 100%;
+      height: 100%;
       background: var(--bg);
       color: var(--text);
       font-family: var(--sans);
@@ -55,15 +51,16 @@
       flex-direction: column;
     }
 
-    /* Subtle grid */
+    /* Grid background */
     body::before {
       content: '';
       position: fixed;
       inset: 0;
       background-image:
-        linear-gradient(rgba(30, 41, 59, 0.4) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(30, 41, 59, 0.4) 1px, transparent 1px);
-      background-size: 48px 48px;
+        linear-gradient(var(--border) 1px, transparent 1px),
+        linear-gradient(90deg, var(--border) 1px, transparent 1px);
+      background-size: 40px 40px;
+      opacity: 0.3;
       pointer-events: none;
       z-index: 0;
     }
@@ -72,63 +69,59 @@
       content: '';
       position: fixed;
       inset: 0;
-      background: radial-gradient(ellipse 70% 40% at 50% -5%, rgba(56, 189, 248, 0.06) 0%, transparent 70%);
+      background: radial-gradient(ellipse 100% 80% at 50% 0%, #0f172a44 0%, transparent 60%);
       pointer-events: none;
       z-index: 0;
     }
 
-    /* ── Header ─────────────────────────────────────────────────────── */
     header {
       position: relative;
       z-index: 10;
-      background: rgba(13, 17, 23, 0.95);
+      background: var(--surface);
       border-bottom: 1px solid var(--border);
-      padding: 0 24px;
-      height: 56px;
+      padding: 16px 24px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      backdrop-filter: blur(8px);
+      gap: 16px;
     }
 
     .header-logo {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 12px;
       font-family: var(--mono);
-      font-size: 14px;
-      font-weight: 600;
-      color: var(--text);
+      font-size: 16px;
+      font-weight: 500;
     }
 
     .header-logo-icon {
-      width: 28px;
-      height: 28px;
+      width: 32px;
+      height: 32px;
       background: linear-gradient(135deg, var(--accent), var(--accent3));
-      border-radius: 7px;
+      border-radius: 8px;
       display: flex;
       align-items: center;
       justify-content: center;
     }
 
     .header-logo-icon svg {
-      width: 16px;
-      height: 16px;
+      width: 18px;
+      height: 18px;
     }
 
-    .header-logo em {
-      font-style: normal;
+    .header-logo span {
       color: var(--accent);
     }
 
     .header-right {
       display: flex;
       align-items: center;
-      gap: 14px;
+      gap: 16px;
     }
 
     .user-badge {
-      font-size: 11px;
+      font-size: 12px;
       color: var(--muted);
       font-family: var(--mono);
       display: flex;
@@ -137,16 +130,16 @@
     }
 
     .btn-logout {
-      padding: 7px 13px;
+      padding: 8px 14px;
       background: transparent;
       border: 1px solid var(--border);
       border-radius: 6px;
-      color: var(--text-dim);
-      font-size: 11px;
+      color: var(--text);
+      font-size: 12px;
       font-weight: 500;
       font-family: var(--mono);
       cursor: pointer;
-      transition: border-color .15s, color .15s;
+      transition: all .2s;
       display: flex;
       align-items: center;
       gap: 6px;
@@ -154,87 +147,74 @@
 
     .btn-logout:hover {
       border-color: var(--muted);
-      color: var(--text);
+      color: var(--text-dim);
     }
 
-    /* ── Main ───────────────────────────────────────────────────────── */
     main {
       position: relative;
       z-index: 1;
       flex: 1;
-      padding: 28px 24px;
-      max-width: 1440px;
+      padding: 24px;
+      max-width: 1400px;
       margin: 0 auto;
       width: 100%;
+      overflow-y: auto;
     }
 
-    .section-label {
-      font-size: 10px;
+    .section-title {
+      font-size: 14px;
       font-weight: 600;
       text-transform: uppercase;
-      letter-spacing: 0.14em;
+      letter-spacing: 0.1em;
       color: var(--muted);
-      margin: 32px 0 14px;
+      margin-bottom: 16px;
       font-family: var(--mono);
       display: flex;
       align-items: center;
       gap: 8px;
     }
 
-    .section-label::after {
-      content: '';
-      flex: 1;
-      height: 1px;
-      background: var(--border-subtle);
-    }
-
-    .section-label:first-child {
-      margin-top: 0;
-    }
-
     /* ── KPI Cards ──────────────────────────────────────────────────── */
     .kpi-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 10px;
-      margin-bottom: 8px;
+      gap: 12px;
+      margin-bottom: 32px;
     }
 
     .kpi-card {
       background: var(--surface2);
       border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 16px 18px;
-      transition: border-color .2s, box-shadow .2s;
+      border-radius: 12px;
+      padding: 16px;
+      transition: all .2s;
       position: relative;
-      overflow: hidden;
     }
 
     .kpi-card:hover {
       border-color: var(--accent);
-      box-shadow: 0 4px 24px rgba(56, 189, 248, 0.08);
+      box-shadow: 0 0 20px rgba(56, 189, 248, 0.15);
     }
 
     .kpi-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 10px;
+      margin-bottom: 8px;
     }
 
     .kpi-label {
-      font-size: 10px;
-      font-weight: 600;
+      font-size: 11px;
+      font-weight: 500;
       text-transform: uppercase;
-      letter-spacing: 0.1em;
+      letter-spacing: 0.08em;
       color: var(--muted);
       font-family: var(--mono);
     }
 
     .kpi-icon {
-      font-size: 12px;
+      font-size: 14px;
       color: var(--muted);
-      transition: color .2s;
     }
 
     .kpi-card:hover .kpi-icon {
@@ -242,25 +222,24 @@
     }
 
     .kpi-value {
-      font-size: 22px;
+      font-size: 24px;
       font-weight: 600;
       font-family: var(--mono);
+      margin-bottom: 4px;
       letter-spacing: -0.5px;
-      line-height: 1;
-      margin-bottom: 5px;
     }
 
     .kpi-subtext {
-      font-size: 11px;
-      color: var(--muted);
+      font-size: 12px;
+      color: var(--text-dim);
       font-family: var(--mono);
     }
 
     .kpi-live {
-      animation: kpipulse 2.5s ease-in-out infinite;
+      animation: pulse 2s ease-in-out infinite;
     }
 
-    @keyframes kpipulse {
+    @keyframes pulse {
 
       0%,
       100% {
@@ -268,31 +247,30 @@
       }
 
       50% {
-        opacity: .65;
+        opacity: .7;
       }
     }
 
     /* ── Host Cards ─────────────────────────────────────────────────── */
     .hosts-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-      gap: 12px;
-      margin-bottom: 8px;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+      margin-bottom: 32px;
     }
 
     .host-card {
       background: var(--surface2);
       border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 18px;
+      border-radius: 12px;
+      padding: 20px;
       cursor: pointer;
-      transition: border-color .2s, box-shadow .2s, background .2s;
+      transition: all .2s;
     }
 
     .host-card:hover {
       border-color: var(--accent);
-      background: var(--surface3);
-      box-shadow: 0 4px 24px rgba(56, 189, 248, 0.1);
+      box-shadow: 0 0 30px rgba(56, 189, 248, 0.2);
     }
 
     .host-card-header {
@@ -309,9 +287,8 @@
     }
 
     .host-icon {
-      font-size: 13px;
+      font-size: 14px;
       color: var(--muted);
-      transition: color .2s;
     }
 
     .host-card:hover .host-icon {
@@ -319,66 +296,56 @@
     }
 
     .host-name {
-      font-size: 14px;
+      font-size: 15px;
       font-weight: 600;
       font-family: var(--mono);
     }
 
     .host-status {
-      width: 8px;
-      height: 8px;
+      width: 12px;
+      height: 12px;
       border-radius: 50%;
-      flex-shrink: 0;
+      animation: pulse-dot 2s ease-in-out infinite;
     }
 
     .host-status.online {
-      background: #22c55e;
-      box-shadow: 0 0 6px rgba(34, 197, 94, 0.5);
-      animation: pulse-status 2.5s ease-in-out infinite;
+      background: #34d399;
     }
 
     .host-status.offline {
       background: var(--muted);
     }
 
-    @keyframes pulse-status {
+    @keyframes pulse-dot {
 
       0%,
       100% {
         opacity: 1;
+        box-shadow: 0 0 0 0 currentColor;
       }
 
       50% {
-        opacity: 0.5;
+        opacity: .7;
       }
     }
 
-    .host-stats {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-    }
-
-    .host-stat-block {
-      background: var(--surface);
-      border: 1px solid var(--border-subtle);
-      border-radius: 6px;
-      padding: 8px 10px;
+    .host-stat {
+      margin-bottom: 12px;
     }
 
     .host-stat-label {
-      font-size: 9px;
+      font-size: 11px;
       color: var(--muted);
       font-family: var(--mono);
       text-transform: uppercase;
-      letter-spacing: 0.08em;
-      margin-bottom: 4px;
+      letter-spacing: 0.05em;
     }
 
     .host-stat-value {
-      font-size: 13px;
+      font-size: 14px;
       font-weight: 600;
       font-family: var(--mono);
+      margin-top: 3px;
     }
 
     .host-stat-value.rx {
@@ -389,250 +356,49 @@
       color: var(--tx);
     }
 
-    .host-card-arrow {
-      display: flex;
-      align-items: center;
-      justify-content: flex-end;
-      margin-top: 12px;
-      font-size: 10px;
-      font-family: var(--mono);
-      color: var(--muted);
-      gap: 4px;
-      opacity: 0;
-      transition: opacity .2s;
-    }
-
-    .host-card:hover .host-card-arrow {
-      opacity: 1;
-    }
-
-    /* ── Charts ─────────────────────────────────────────────────────── */
+    /* ── Charts ────────────────────────────────────────────────────── */
     .charts-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(480px, 1fr));
-      gap: 12px;
+      grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+      gap: 16px;
     }
 
     .chart-card {
       background: var(--surface2);
       border: 1px solid var(--border);
-      border-radius: var(--radius);
+      border-radius: 12px;
       padding: 20px;
     }
 
-    .chart-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 16px;
-    }
-
-    .chart-header-left {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
     .chart-title {
-      font-size: 13px;
+      font-size: 14px;
       font-weight: 600;
+      margin-bottom: 16px;
       font-family: var(--mono);
-    }
-
-    .chart-header i {
-      color: var(--muted);
-      font-size: 12px;
-    }
-
-    .chart-badge {
-      font-size: 10px;
-      font-family: var(--mono);
-      color: var(--muted);
-      background: var(--surface3);
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      padding: 3px 8px;
     }
 
     canvas {
-      max-height: 280px;
+      max-height: 300px;
     }
 
-    /* ── Footer ─────────────────────────────────────────────────────── */
-    footer {
-      position: relative;
-      z-index: 10;
-      border-top: 1px solid var(--border);
-      background: var(--surface);
-      padding: 0 24px;
-    }
-
-    .footer-inner {
-      max-width: 1440px;
-      margin: 0 auto;
-      padding: 18px 0;
-    }
-
-    .footer-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr auto;
-      gap: 0;
-      align-items: start;
-    }
-
-    .footer-group {
-      padding: 0 20px;
-      border-right: 1px solid var(--border-subtle);
-    }
-
-    .footer-group:first-child {
-      padding-left: 0;
-    }
-
-    .footer-group:last-child {
-      border-right: none;
-      padding-right: 0;
-      display: flex;
-      align-items: center;
-    }
-
-    .footer-group-label {
-      font-size: 9px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.14em;
-      color: var(--muted);
-      font-family: var(--mono);
-      margin-bottom: 10px;
-    }
-
-    .footer-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 24px;
-      margin-bottom: 4px;
-    }
-
-    .footer-row:last-child {
-      margin-bottom: 0;
-    }
-
-    .footer-key {
-      font-size: 11px;
-      font-family: var(--mono);
-      color: var(--muted);
-      white-space: nowrap;
-    }
-
-    .footer-val {
-      font-size: 11px;
-      font-family: var(--mono);
-      color: var(--text-dim);
-      font-weight: 500;
-    }
-
-    .footer-val.rx {
-      color: var(--rx);
-    }
-
-    .footer-val.tx {
-      color: var(--tx);
-    }
-
-    .footer-hosts {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-    }
-
-    .footer-host-pill {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      font-size: 10px;
-      font-family: var(--mono);
-      color: var(--text-dim);
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      padding: 3px 8px;
-    }
-
-    .footer-host-pill .dot {
-      width: 5px;
-      height: 5px;
-      border-radius: 50%;
-      background: #22c55e;
-    }
-
-    .footer-host-pill .dot.off {
-      background: var(--muted);
-    }
-
-    .footer-refresh {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 11px;
-      font-family: var(--mono);
-      color: var(--muted);
-      white-space: nowrap;
-    }
-
-    .footer-refresh i {
-      font-size: 10px;
-      color: var(--accent);
-    }
-
-    .footer-bottom {
-      border-top: 1px solid var(--border-subtle);
-      margin-top: 14px;
-      padding-top: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .footer-brand {
-      font-size: 11px;
-      font-family: var(--mono);
-      color: var(--muted);
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .footer-brand span {
-      color: var(--accent);
-    }
-
-    .footer-meta {
-      font-size: 10px;
-      font-family: var(--mono);
-      color: var(--muted);
-    }
-
-    /* ── Spinner / Empty ────────────────────────────────────────────── */
+    /* ── Loading ────────────────────────────────────────────────────── */
     .loading {
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 10px;
+      gap: 12px;
       color: var(--muted);
       font-family: var(--mono);
       font-size: 12px;
-      padding: 20px 0;
-      width: 100%;
     }
 
     .spinner {
-      width: 14px;
-      height: 14px;
+      width: 16px;
+      height: 16px;
       border: 2px solid var(--border);
       border-top-color: var(--accent);
       border-radius: 50%;
-      animation: spin .7s linear infinite;
+      animation: spin .6s linear infinite;
     }
 
     @keyframes spin {
@@ -642,35 +408,12 @@
     }
 
     /* ── Responsive ─────────────────────────────────────────────────── */
-    @media (max-width: 1024px) {
-      .charts-grid {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    @media (max-width: 900px) {
-      .footer-grid {
-        grid-template-columns: 1fr 1fr;
-        gap: 16px;
-      }
-
-      .footer-group {
-        border-right: none;
-        padding: 0;
-      }
-    }
-
-    @media (max-width: 600px) {
+    @media (max-width: 768px) {
       main {
         padding: 16px;
       }
 
-      header,
-      footer {
-        padding: 0 16px;
-      }
-
-      .footer-grid {
+      .charts-grid {
         grid-template-columns: 1fr;
       }
 
@@ -689,12 +432,11 @@
   <header>
     <div class="header-logo">
       <div class="header-logo-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5" stroke-linecap="round"
-          stroke-linejoin="round">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2" stroke-linecap="round">
           <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
         </svg>
       </div>
-      vn<em>dash</em>
+      <span>vn<span>dash</span></span>
     </div>
     <div class="header-right">
       <div class="user-badge" id="userBadge"><i class="fa-solid fa-user"></i> —</div>
@@ -703,117 +445,43 @@
   </header>
 
   <main>
-    <div class="section-label"><i class="fa-solid fa-chart-pie"></i> Agregado Total</div>
+    <div class="section-title"><i class="fa-solid fa-chart-pie"></i> Agregado Total</div>
     <div class="kpi-grid" id="kpiGrid">
       <div class="loading">
         <div class="spinner"></div> Carregando...
       </div>
     </div>
 
-    <div class="section-label"><i class="fa-solid fa-network-wired"></i> Hosts</div>
+    <div class="section-title" style="margin-top: 32px;"><i class="fa-solid fa-network-wired"></i> Hosts</div>
     <div class="hosts-grid" id="hostsGrid">
       <div class="loading">
         <div class="spinner"></div> Carregando...
       </div>
     </div>
 
-    <div class="section-label"><i class="fa-solid fa-chart-line"></i> Gráficos</div>
+    <div class="section-title" style="margin-top: 32px;"><i class="fa-solid fa-chart-line"></i> Gráficos</div>
     <div class="charts-grid">
       <div class="chart-card">
-        <div class="chart-header">
-          <div class="chart-header-left">
-            <i class="fa-solid fa-chart-bar"></i>
-            <div class="chart-title">Últimos 30 dias (por host)</div>
-          </div>
-          <div class="chart-badge">30 dias</div>
-        </div>
+        <div class="chart-title">Últimos 30 dias (por host)</div>
         <canvas id="dailyChart"></canvas>
       </div>
       <div class="chart-card">
-        <div class="chart-header">
-          <div class="chart-header-left">
-            <i class="fa-solid fa-chart-line"></i>
-            <div class="chart-title">Últimos 12 meses (agregado)</div>
-          </div>
-          <div class="chart-badge">12 meses</div>
-        </div>
+        <div class="chart-title">Últimos 12 meses (agregado)</div>
         <canvas id="monthlyChart"></canvas>
       </div>
     </div>
   </main>
 
-  <footer>
-    <div class="footer-inner">
-      <div class="footer-grid">
-
-        <!-- Agregado RX/TX -->
-        <div class="footer-group">
-          <div class="footer-group-label"><i class="fa-solid fa-chart-pie"></i> Tráfego Total</div>
-          <div class="footer-row">
-            <div class="footer-key">↓ Recebido</div>
-            <div class="footer-val rx" id="fTotalRx">—</div>
-          </div>
-          <div class="footer-row">
-            <div class="footer-key">↑ Enviado</div>
-            <div class="footer-val tx" id="fTotalTx">—</div>
-          </div>
-          <div class="footer-row">
-            <div class="footer-key">Este mês</div>
-            <div class="footer-val" id="fMonthSum">—</div>
-          </div>
-        </div>
-
-        <!-- Mês corrente -->
-        <div class="footer-group">
-          <div class="footer-group-label"><i class="fa-solid fa-calendar-days"></i> Mês Corrente</div>
-          <div class="footer-row">
-            <div class="footer-key">↓ Recebido</div>
-            <div class="footer-val rx" id="fMonthRx">—</div>
-          </div>
-          <div class="footer-row">
-            <div class="footer-key">↑ Enviado</div>
-            <div class="footer-val tx" id="fMonthTx">—</div>
-          </div>
-          <div class="footer-row">
-            <div class="footer-key">Hosts ativos</div>
-            <div class="footer-val" id="fHostsOnline">—</div>
-          </div>
-        </div>
-
-        <!-- Hosts -->
-        <div class="footer-group">
-          <div class="footer-group-label"><i class="fa-solid fa-server"></i> Hosts</div>
-          <div class="footer-hosts" id="fHostPills">—</div>
-        </div>
-
-        <!-- Última atualização -->
-        <div class="footer-group">
-          <div class="footer-refresh">
-            <i class="fa-solid fa-rotate"></i>
-            <span id="fLastUpdate">Atualizando...</span>
-          </div>
-        </div>
-
-      </div>
-
-      <div class="footer-bottom">
-        <div class="footer-brand">
-          <i class="fa-solid fa-chart-area"></i>
-          vn<span>dash</span>
-        </div>
-        <div class="footer-meta" id="fFooterMeta">atualiza a cada 30s</div>
-      </div>
-    </div>
-  </footer>
-
   <script>
     let dailyChartInstance = null;
     let monthlyChartInstance = null;
 
+    // ── Init ────────────────────────────────────────────────────────────
     document.addEventListener('DOMContentLoaded', () => {
       loadUser();
       loadOverview();
       loadCharts();
+      // Refresh every 30 seconds
       setInterval(loadOverview, 30000);
     });
 
@@ -822,8 +490,8 @@
         const res = await fetch('/api/auth/me');
         if (!res.ok) throw new Error('Unauthorized');
         const data = await res.json();
-        document.getElementById('userBadge').innerHTML = `<i class="fa-solid fa-user"></i> ${data.username}`;
-      } catch {
+        document.getElementById('userBadge').innerHTML = `<i class="fa-solid fa-user"></i> @ ${data.username}`;
+      } catch (err) {
         window.location.href = '/login';
       }
     }
@@ -833,22 +501,22 @@
         const res = await fetch('/api/overview');
         const data = await res.json();
 
-        // KPI Cards
-        document.getElementById('kpiGrid').innerHTML = `
+        const kpiGrid = document.getElementById('kpiGrid');
+        kpiGrid.innerHTML = `
           <div class="kpi-card">
             <div class="kpi-header">
-              <div class="kpi-label">Total Recebido</div>
+              <div class="kpi-label">Total Recebido (cumulative)</div>
               <i class="fa-solid fa-cloud-arrow-down kpi-icon"></i>
             </div>
-            <div class="kpi-value" style="color:var(--rx)">${data.total_rx_fmt}</div>
+            <div class="kpi-value">${data.total_rx_fmt}</div>
             <div class="kpi-subtext">${formatBytes(data.total_rx)}</div>
           </div>
           <div class="kpi-card">
             <div class="kpi-header">
-              <div class="kpi-label">Total Enviado</div>
+              <div class="kpi-label">Total Enviado (cumulative)</div>
               <i class="fa-solid fa-cloud-arrow-up kpi-icon"></i>
             </div>
-            <div class="kpi-value" style="color:var(--tx)">${data.total_tx_fmt}</div>
+            <div class="kpi-value">${data.total_tx_fmt}</div>
             <div class="kpi-subtext">${formatBytes(data.total_tx)}</div>
           </div>
           <div class="kpi-card">
@@ -856,13 +524,14 @@
               <div class="kpi-label">Total Mês</div>
               <i class="fa-solid fa-calendar-days kpi-icon"></i>
             </div>
-            <div class="kpi-value kpi-live">${data.month_rx_fmt}</div>
+            <div class="kpi-value">${data.month_rx_fmt}</div>
             <div class="kpi-subtext">↓ + ${data.month_tx_fmt} ↑</div>
           </div>
         `;
 
         // Host cards
-        document.getElementById('hostsGrid').innerHTML = data.hosts.map(h => `
+        const hostsGrid = document.getElementById('hostsGrid');
+        hostsGrid.innerHTML = data.hosts.map(h => `
           <div class="host-card" onclick="goToHost('${h.name}')">
             <div class="host-card-header">
               <div class="host-title-wrapper">
@@ -871,48 +540,16 @@
               </div>
               <div class="host-status ${h.online ? 'online' : 'offline'}" title="${h.online ? 'Online' : 'Offline'}"></div>
             </div>
-            <div class="host-stats">
-              <div class="host-stat-block">
-                <div class="host-stat-label">↓ Recebido</div>
-                <div class="host-stat-value rx">${h.rx_total_fmt}</div>
-              </div>
-              <div class="host-stat-block">
-                <div class="host-stat-label">↑ Enviado</div>
-                <div class="host-stat-value tx">${h.tx_total_fmt}</div>
-              </div>
+            <div class="host-stat">
+              <div class="host-stat-label">Recebido Total</div>
+              <div class="host-stat-value rx">${h.rx_total_fmt}</div>
             </div>
-            <div class="host-card-arrow">ver detalhes <i class="fa-solid fa-arrow-right"></i></div>
+            <div class="host-stat">
+              <div class="host-stat-label">Enviado Total</div>
+              <div class="host-stat-value tx">${h.tx_total_fmt}</div>
+            </div>
           </div>
         `).join('');
-
-        // Footer
-        setText('fTotalRx', data.total_rx_fmt || '—');
-        setText('fTotalTx', data.total_tx_fmt || '—');
-        setText('fMonthRx', data.month_rx_fmt || '—');
-        setText('fMonthTx', data.month_tx_fmt || '—');
-
-        const monthRx = data.month_rx || 0;
-        const monthTx = data.month_tx || 0;
-        setText('fMonthSum', formatBytes(monthRx + monthTx));
-
-        const onlineCount = (data.hosts || []).filter(h => h.online).length;
-        const totalCount = (data.hosts || []).length;
-        setText('fHostsOnline', `${onlineCount} / ${totalCount}`);
-
-        const pillsEl = document.getElementById('fHostPills');
-        if (data.hosts && data.hosts.length) {
-          pillsEl.innerHTML = data.hosts.map(h => `
-            <div class="footer-host-pill">
-              <div class="dot ${h.online ? '' : 'off'}"></div>
-              ${h.display_name}
-            </div>
-          `).join('');
-        }
-
-        const now = new Date();
-        setText('fLastUpdate', `${now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}`);
-        setText('fFooterMeta', `${now.toLocaleDateString('pt-BR')} · atualiza a cada 30s`);
-
       } catch (err) {
         console.error('loadOverview:', err);
       }
@@ -920,7 +557,9 @@
 
     async function apiFetch(url) {
       const response = await fetch(url);
-      if (!response.ok) throw new Error(`Erro (${response.status}): ${response.statusText}`);
+      if (!response.ok) {
+        throw new Error(`Erro na requisição (${response.status}): ${response.statusText}`);
+      }
       return response.json();
     }
 
@@ -931,81 +570,66 @@
           apiFetch('/api/chart/monthly'),
         ]);
 
-        const baseOpts = () => ({
+        const baseOpts = (type) => ({
           responsive: true,
           maintainAspectRatio: true,
           interaction: { mode: 'index', intersect: false },
           plugins: {
-            legend: {
-              labels: {
-                color: '#94a3b8',
-                font: { family: 'IBM Plex Mono, monospace', size: 11 },
-                padding: 16,
-                usePointStyle: true,
-                pointStyleWidth: 8,
-              }
-            },
+            legend: { labels: { color: '#cbd5e1', font: { family: 'IBM Plex Mono, monospace', size: 11 }, padding: 16, usePointStyle: true } },
             tooltip: {
-              backgroundColor: '#0d1117',
-              borderColor: '#1e293b',
-              borderWidth: 1,
-              padding: 10,
+              backgroundColor: '#0f172a', borderColor: '#38bdf8', borderWidth: 1,
               titleFont: { family: 'IBM Plex Mono, monospace', size: 12 },
               bodyFont: { family: 'IBM Plex Mono, monospace', size: 11 },
-              callbacks: { label: ctx => `  ${ctx.dataset.label}: ${formatBytes(ctx.parsed.y)}` },
+              callbacks: { label: ctx => ctx.dataset.label + ': ' + formatBytes(ctx.parsed.y) },
             },
           },
           scales: {
-            x: {
-              grid: { color: 'rgba(30,41,59,0.5)' },
-              ticks: { color: '#475569', maxTicksLimit: 10, font: { family: 'IBM Plex Mono, monospace', size: 10 } }
-            },
-            y: {
-              grid: { color: 'rgba(30,41,59,0.5)' },
-              ticks: { color: '#475569', font: { family: 'IBM Plex Mono, monospace', size: 10 }, callback: v => formatBytes(v) }
-            },
+            x: { grid: { color: '#1e293b' }, ticks: { color: '#64748b', maxTicksLimit: 10, font: { family: 'IBM Plex Mono, monospace', size: 10 } } },
+            y: { grid: { color: '#1e293b' }, ticks: { color: '#64748b', font: { family: 'IBM Plex Mono, monospace', size: 10 }, callback: v => formatBytes(v) } },
           },
         });
 
-        // Daily
+        // ── Daily chart ──────────────────────────────────────────────────
         if (!daily.labels || daily.labels.length === 0) {
-          showEmptyChart('dailyChart', 'Aguardando dados');
+          showEmptyChart('dailyChart', 'Aguardando dados (próximos ciclos do coletor)');
         } else {
           const dailyCtx = document.getElementById('dailyChart').getContext('2d');
           if (dailyChartInstance) dailyChartInstance.destroy();
 
           const RX_COLORS = ['#38bdf8', '#34d399', '#a78bfa'];
           const TX_COLORS = ['#f472b6', '#fb923c', '#facc15'];
+
           const hostNames = [...new Set(daily.datasets.map(d => d.host))];
           const cleanDatasets = [];
 
           hostNames.forEach((host, i) => {
             const rxDs = daily.datasets.find(d => d.host === host && d.type === 'rx');
             const txDs = daily.datasets.find(d => d.host === host && d.type === 'tx');
+
             if (rxDs) cleanDatasets.push({
               label: rxDs.label,
               data: rxDs.data.map(Number),
-              backgroundColor: RX_COLORS[i % RX_COLORS.length] + '22',
+              backgroundColor: RX_COLORS[i % RX_COLORS.length] + 'cc',
               borderColor: RX_COLORS[i % RX_COLORS.length],
-              borderRadius: 3, borderWidth: 1.5,
+              borderRadius: 3, borderWidth: 1,
             });
             if (txDs) cleanDatasets.push({
               label: txDs.label,
               data: txDs.data.map(Number),
-              backgroundColor: TX_COLORS[i % TX_COLORS.length] + '22',
+              backgroundColor: TX_COLORS[i % TX_COLORS.length] + 'cc',
               borderColor: TX_COLORS[i % TX_COLORS.length],
-              borderRadius: 3, borderWidth: 1.5,
+              borderRadius: 3, borderWidth: 1,
             });
           });
 
           dailyChartInstance = new Chart(dailyCtx, {
             type: 'bar',
             data: { labels: daily.labels, datasets: cleanDatasets },
-            options: baseOpts(),
+            options: baseOpts('bar'),
           });
         }
 
-        // Monthly
+        // ── Monthly chart ────────────────────────────────────────────────
         if (!monthly.labels || monthly.labels.length === 0) {
           showEmptyChart('monthlyChart', 'Aguardando dados mensais');
         } else {
@@ -1020,31 +644,27 @@
             cleanMonthly.push({
               label: ds.label + ' ↓',
               data: (ds.rx || []).map(Number),
-              borderColor: c,
-              backgroundColor: c + '18',
-              borderWidth: 2, tension: 0.35, fill: true,
-              pointRadius: 3, pointHoverRadius: 5,
-              pointBackgroundColor: c,
+              borderColor: c, backgroundColor: c + '33',
+              borderWidth: 2, tension: 0.4, fill: true,
+              pointRadius: 4, pointHoverRadius: 6,
             });
             cleanMonthly.push({
               label: ds.label + ' ↑',
               data: (ds.tx || []).map(Number),
-              borderColor: c + 'aa',
-              backgroundColor: 'transparent',
-              borderWidth: 1.5, tension: 0.35, fill: false,
-              borderDash: [4, 3],
-              pointRadius: 2, pointHoverRadius: 4,
+              borderColor: c + 'aa', backgroundColor: 'transparent',
+              borderWidth: 1.5, tension: 0.4, fill: false, borderDash: [4, 3],
+              pointRadius: 3, pointHoverRadius: 5,
             });
           });
 
           monthlyChartInstance = new Chart(monthlyCtx, {
             type: 'line',
             data: { labels: monthly.labels, datasets: cleanMonthly },
-            options: baseOpts(),
+            options: baseOpts('line'),
           });
         }
       } catch (err) {
-        console.error('[charts]', err);
+        console.error('[charts] ERRO:', err);
       }
     }
 
@@ -1055,15 +675,10 @@
       if (!parent.querySelector('.empty-msg')) {
         const el = document.createElement('div');
         el.className = 'empty-msg';
-        el.style.cssText = 'display:flex;align-items:center;justify-content:center;height:180px;color:#475569;font-family:var(--mono);font-size:12px;gap:8px;';
+        el.style.cssText = 'display:flex;align-items:center;justify-content:center;height:200px;color:#64748b;font-family:var(--mono);font-size:13px;gap:8px;';
         el.innerHTML = `<i class="fa-solid fa-circle-exclamation"></i> ${msg}`;
         parent.appendChild(el);
       }
-    }
-
-    function setText(id, val) {
-      const el = document.getElementById(id);
-      if (el) el.textContent = val;
     }
 
     function formatBytes(bytes) {
@@ -1074,11 +689,16 @@
       return (bytes / Math.pow(k, i)).toFixed(1) + ' ' + sizes[i];
     }
 
-    function goToHost(name) { window.location.href = `/host/${name}`; }
+    function goToHost(name) {
+      window.location.href = `/host/${name}`;
+    }
 
     async function doLogout() {
-      try { await fetch('/api/auth/logout', { method: 'POST' }); }
-      finally { window.location.href = '/login'; }
+      try {
+        await fetch('/api/auth/logout', { method: 'POST' });
+      } finally {
+        window.location.href = '/login';
+      }
     }
   </script>
 </body>
