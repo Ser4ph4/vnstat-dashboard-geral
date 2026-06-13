@@ -1,9 +1,3 @@
-'''
-Author: Ser4ph4
-Date: 2026-06-13 04:58:27
-LastEditors: Ser4ph4
-LastEditTime: 2026-06-13 17:16:48
-'''
 from __future__ import annotations
 import os
 import secrets
