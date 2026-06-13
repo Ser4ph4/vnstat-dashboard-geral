@@ -1,10 +1,13 @@
+'''
+Author: Ser4ph4
+Date: 2026-06-13 04:58:27
+LastEditors: Ser4ph4
+LastEditTime: 2026-06-13 14:14:18
+'''
 from __future__ import annotations
-
 import os
 import secrets
 from datetime import timedelta
-
-# 1. ADICIONADO O IMPORTE 'send_from_directory' AQUI:
 from flask import Flask, send_from_directory
 from flask_jwt_extended import JWTManager
 from flask_sqlalchemy import SQLAlchemy
