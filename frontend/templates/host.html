@@ -352,17 +352,31 @@
     }
 
     /* ── Heatmap ────────────────────────────────────────────────────── */
+    .heatmap-outer {
+      background: rgba(15, 21, 32, 0.3);
+      padding: 16px;
+      border-radius: 12px;
+      border: 1px solid rgba(30, 41, 59, 0.6);
+      width: max-content;
+      max-width: 100%;
+    }
+
+    .heatmap-inner-layout {
+      display: flex;
+      align-items: flex-start;
+    }
+
     .heatmap-wrap {
       overflow-x: auto;
-      padding-bottom: 4px;
-      width: 100%;
     }
 
     .heatmap-grid {
       display: grid;
       grid-template-rows: repeat(7, 18px);
       grid-auto-flow: column;
+      grid-auto-columns: 18px;
       gap: 4px;
+      width: max-content;
     }
 
     .hm-cell {
@@ -376,7 +390,7 @@
     }
 
     .hm-cell:hover {
-      transform: scale(1.25);
+      transform: scale(1.3);
       z-index: 10;
     }
 
@@ -424,26 +438,17 @@
       display: grid;
       grid-template-rows: repeat(7, 18px);
       gap: 4px;
-      margin-right: 10px;
+      margin-right: 12px;
       flex-shrink: 0;
     }
 
     .heatmap-dow span {
-      font-size: 9px;
+      font-size: 10px;
       font-family: var(--mono);
       color: var(--muted);
       display: flex;
       align-items: center;
       line-height: 1;
-    }
-
-    .heatmap-outer {
-      display: flex;
-      align-items: flex-start;
-      background: rgba(15, 21, 32, 0.5);
-      padding: 12px;
-      border-radius: 8px;
-      border: 1px solid rgba(30, 41, 59, 0.5);
     }
 
     /* ── Top Days Table ─────────────────────────────────────────────── */
@@ -578,7 +583,7 @@
       </div>
 
       <div class="section-title"><i class="fa-solid fa-fire"></i> Mapa de Calor — Tráfego por Dia</div>
-      <div class="chart-card" style="margin-bottom:20px;">
+      <div class="chart-card" style="margin-bottom:20px; overflow-x: auto;">
         <div class="chart-header">
           <div class="chart-header-left">
             <i class="fa-solid fa-calendar-week" style="color:var(--muted);font-size:13px;"></i>
@@ -586,11 +591,13 @@
           </div>
           <span class="chart-badge" id="heatmapLegendLabel">RX + TX</span>
         </div>
-        <div class="heatmap-outer" id="heatmapOuter">
+
+        <div id="heatmapOuter">
           <div class="loading">
             <div class="spinner"></div> Carregando...
           </div>
         </div>
+
         <div class="heatmap-legend">
           Menos
           <div class="heatmap-legend-cells" id="heatmapLegendCells"></div>
@@ -778,23 +785,23 @@
         });
 
         // ══════════════════════════════════════════════════════════════
-        // ── RENDERIZAÇÃO DA ABA ANÁLISE (DINÂMICA)
+        // ── RENDERIZAÇÃO DA ABA ANÁLISE (100% CLIENT-SIDE)
         // ══════════════════════════════════════════════════════════════
         const totalRx = data.days.reduce((acc, d) => acc + Number(d.rx), 0);
         const totalTx = data.days.reduce((acc, d) => acc + Number(d.tx), 0);
 
-        // 1. Indicadores (KPIs Superiores)
+        // 1. Indicadores Básicos
         document.getElementById('analysisKpis').innerHTML = `
           <div class="kpi-card"><div class="kpi-label">Média Diária</div><div class="kpi-value" style="color:var(--accent)">${formatBytes((totalRx + totalTx) / (data.days.length || 1))}</div></div>
           <div class="kpi-card"><div class="kpi-label">Dias Monitorados</div><div class="kpi-value">${data.days.length} dias</div></div>
         `;
 
-        // 2. Tabela de Top 10 dias
-        if (data.top_days || data.top) {
-          const topDays = data.top_days || data.top;
-          const maxTotal = Math.max(...topDays.map(d => (Number(d.rx) + Number(d.tx))), 1);
+        // 2. CORREÇÃO: Tabela de Top 10 dias (Gera o ranking direto pelo histórico caso a API não envie ordenado)
+        const sortedDays = data.top_days || data.top || [...data.days].sort((a, b) => (Number(b.rx) + Number(b.tx)) - (Number(a.rx) + Number(a.tx)));
+        if (sortedDays && sortedDays.length > 0) {
+          const maxTotal = Math.max(...sortedDays.map(d => (Number(d.rx) + Number(d.tx))), 1);
 
-          document.getElementById('topDaysTbody').innerHTML = topDays.slice(0, 10).map((d, index) => {
+          document.getElementById('topDaysTbody').innerHTML = sortedDays.slice(0, 10).map((d, index) => {
             const total = Number(d.rx) + Number(d.tx);
             const percentage = (total / maxTotal) * 100;
             return `
@@ -857,7 +864,7 @@
               {
                 label: 'Volume Diário',
                 data: dailyTotals,
-                borderColor: 'rgba(56, 189, 248, 0.2)',
+                borderColor: 'rgba(56, 189, 248, 0.15)',
                 backgroundColor: 'transparent',
                 borderWidth: 1,
                 pointRadius: 0
@@ -869,42 +876,80 @@
                 backgroundColor: 'transparent',
                 borderWidth: 2,
                 tension: 0.3,
-                pointRadius: 1
+                pointRadius: 2,
+                pointBackgroundColor: '#818cf8'
               }
             ]
           },
           options: chartBaseOpts
         });
 
-        // 5. Geração Dinâmica do Mapa de Calor (Heatmap)
-        const maxDayTotal = Math.max(...data.days.map(d => Number(d.rx) + Number(d.tx)), 1);
-        let hmHtml = `
-          <div class="heatmap-dow">
-            <span>Dom</span><span>Seg</span><span>Ter</span><span>Qua</span><span>Qui</span><span>Sex</span><span>Sáb</span>
-          </div>
-          <div class="heatmap-wrap">
-            <div class="heatmap-grid">
+        // 5. CORREÇÃO: Alinhamento Semanal + Geração Dinâmica da Linha de Meses do Heatmap
+        const firstDateStr = data.days[0]?.date;
+        const firstDayOfWeek = firstDateStr ? new Date(firstDateStr + 'T00:00:00').getDay() : 0;
+
+        // Alinha os dados inserindo blocos vazios se a primeira semana não começar no Domingo
+        let cells = [];
+        for (let i = 0; i < firstDayOfWeek; i++) {
+          cells.push({ isPadding: true });
+        }
+        data.days.forEach(d => cells.push({ ...d, isPadding: false }));
+
+        const numCols = Math.ceil(cells.length / 7);
+        const monthNames = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+        let lastMonth = -1;
+
+        // Monta a fileira superior de Meses alinhada perfeitamente com as colunas em grid
+        let monthsHtml = `<div class="heatmap-months" style="display: grid; grid-template-columns: repeat(${numCols}, 18px); gap: 4px; margin-left: 36px; margin-bottom: 6px; height: 12px;">`;
+        for (let col = 0; col < numCols; col++) {
+          let colMonthLabel = '';
+          for (let row = 0; row < 7; row++) {
+            const idx = col * 7 + row;
+            if (cells[idx] && !cells[idx].isPadding && cells[idx].date) {
+              const m = new Date(cells[idx].date + 'T00:00:00').getMonth();
+              if (m !== lastMonth) {
+                colMonthLabel = monthNames[m];
+                lastMonth = m;
+                break;
+              }
+            }
+          }
+          monthsHtml += `<span style="font-size: 10px; color: var(--muted); font-family: var(--mono); grid-column: ${col + 1}; white-space: nowrap;">${colMonthLabel}</span>`;
+        }
+        monthsHtml += `</div>`;
+
+        // Monta a estrutura da grade do Mapa de Calor
+        let hmHtml = monthsHtml + `
+          <div class="heatmap-inner-layout">
+            <div class="heatmap-dow">
+              <span>Dom</span><span>Seg</span><span>Ter</span><span>Qua</span><span>Qui</span><span>Sex</span><span>Sáb</span>
+            </div>
+            <div class="heatmap-wrap">
+              <div class="heatmap-grid">
         `;
 
-        hmHtml += data.days.map(d => {
-          const total = Number(d.rx) + Number(d.tx);
+        const maxDayTotal = Math.max(...data.days.map(d => Number(d.rx) + Number(d.tx)), 1);
+        hmHtml += cells.map(c => {
+          if (c.isPadding) {
+            return `<div class="hm-cell" style="background: transparent; border: none; pointer-events: none;"></div>`;
+          }
+          const total = Number(c.rx) + Number(c.tx);
           const weight = total / maxDayTotal;
-          let bgColor = 'var(--border)'; // Sem tráfego
+          let bgColor = 'var(--border)';
 
           if (total > 0) {
-            // Calcula opacidade incremental baseado no uso relativo
-            const alpha = Math.max(0.15, Math.min(weight, 1)).toFixed(2);
+            const alpha = Math.max(0.2, Math.min(weight, 1)).toFixed(2);
             bgColor = `rgba(56, 189, 248, ${alpha})`;
           }
 
-          const tip = `${d.date} • Total: ${formatBytes(total)} (↓${formatBytes(d.rx)} ↑${formatBytes(d.tx)})`;
+          const tip = `${c.date} • Total: ${formatBytes(total)} (↓${formatBytes(c.rx)} ↑${formatBytes(c.tx)})`;
           return `<div class="hm-cell" style="background: ${bgColor}" data-tip="${tip}"></div>`;
         }).join('');
 
-        hmHtml += `</div></div>`;
+        hmHtml += `</div></div></div>`;
         document.getElementById('heatmapOuter').innerHTML = hmHtml;
 
-        // Renderiza quadradinhos da legenda do Heatmap (apenas uma vez)
+        // Renderiza as cores da legenda de intensidade
         const legendCells = document.getElementById('heatmapLegendCells');
         if (legendCells) {
           legendCells.innerHTML = [0, 0.25, 0.5, 0.75, 1].map(v => {
