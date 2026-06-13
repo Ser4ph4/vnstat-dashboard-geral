@@ -2,7 +2,7 @@
 Author: Ser4ph4
 Date: 2026-06-13 04:58:27
 LastEditors: Ser4ph4
-LastEditTime: 2026-06-13 14:29:42
+LastEditTime: 2026-06-13 17:12:35
 '''
 from __future__ import annotations
 import os
@@ -23,7 +23,13 @@ def create_app(config_override: dict | None = None) -> Flask:
     template_dir = os.path.join(project_root, "frontend", "templates")
     static_dir = os.path.join(project_root, "frontend", "static")
 
-    app = Flask(__name__, template_folder=template_dir, static_folder=static_dir)
+    # CORREÇÃO: Adicionado static_url_path para fixar a rota mapeada no Docker
+    app = Flask(
+        __name__, 
+        template_folder=template_dir, 
+        static_folder=static_dir,
+        static_url_path='/static'
+    )
 
     # ── Core config ─────────────────────────────────────────────────────
     app.config.update(
