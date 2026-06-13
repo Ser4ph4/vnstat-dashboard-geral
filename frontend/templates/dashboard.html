@@ -488,11 +488,18 @@
     async function loadUser() {
       try {
         const res = await fetch('/api/auth/me');
-        if (!res.ok) throw new Error('Unauthorized');
+
+        if (res.status === 401 || res.status === 403) {
+          window.location.href = '/login';
+          return;
+        }
+
+        if (!res.ok) throw new Error(`Server error: ${res.status}`);
+
         const data = await res.json();
         document.getElementById('userBadge').innerHTML = `<i class="fa-solid fa-user"></i> @ ${data.username}`;
       } catch (err) {
-        window.location.href = '/login';
+        console.error('Erro ao verificar usuário (pode ser lentidão):', err);
       }
     }
 
