@@ -134,7 +134,6 @@
       max-width: 1480px;
       margin: 0 auto;
       width: 100%;
-
     }
 
     .section-title {
@@ -337,21 +336,6 @@
       grid-template-columns: 1fr;
     }
 
-    .chart-card {
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 20px;
-    }
-
-    .chart-card .chart-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-      margin-bottom: 16px;
-    }
-
     .chart-header-left {
       display: flex;
       align-items: center;
@@ -371,13 +355,14 @@
     .heatmap-wrap {
       overflow-x: auto;
       padding-bottom: 4px;
+      width: 100%;
     }
 
     .heatmap-grid {
       display: grid;
       grid-template-rows: repeat(7, 18px);
       grid-auto-flow: column;
-      gap: 3px;
+      gap: 4px;
     }
 
     .hm-cell {
@@ -391,7 +376,7 @@
     }
 
     .hm-cell:hover {
-      transform: scale(1.3);
+      transform: scale(1.25);
       z-index: 10;
     }
 
@@ -411,13 +396,14 @@
       border-radius: 4px;
       pointer-events: none;
       z-index: 100;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
     }
 
     .heatmap-legend {
       display: flex;
       align-items: center;
       gap: 6px;
-      margin-top: 12px;
+      margin-top: 16px;
       font-size: 10px;
       color: var(--muted);
       font-family: var(--mono);
@@ -425,20 +411,20 @@
 
     .heatmap-legend-cells {
       display: flex;
-      gap: 3px;
+      gap: 4px;
     }
 
     .hm-legend-cell {
-      width: 12px;
-      height: 12px;
+      width: 14px;
+      height: 14px;
       border-radius: 2px;
     }
 
     .heatmap-dow {
       display: grid;
       grid-template-rows: repeat(7, 18px);
-      gap: 3px;
-      margin-right: 6px;
+      gap: 4px;
+      margin-right: 10px;
       flex-shrink: 0;
     }
 
@@ -454,6 +440,10 @@
     .heatmap-outer {
       display: flex;
       align-items: flex-start;
+      background: rgba(15, 21, 32, 0.5);
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid rgba(30, 41, 59, 0.5);
     }
 
     /* ── Top Days Table ─────────────────────────────────────────────── */
@@ -541,7 +531,6 @@
   </header>
 
   <main>
-    <!-- ── Tab Navigation ──────────────────────────────────────────── -->
     <nav class="tab-nav">
       <button class="tab-btn active" onclick="switchTab('overview', this)">
         <i class="fa-solid fa-gauge-high"></i> Visão Geral
@@ -551,9 +540,6 @@
       </button>
     </nav>
 
-    <!-- ══════════════════════════════════════════════════════════════ -->
-    <!-- TAB: Visão Geral                                              -->
-    <!-- ══════════════════════════════════════════════════════════════ -->
     <div class="tab-panel active" id="tab-overview">
 
       <div class="section-title"><i class="fa-solid fa-gauge-high"></i> Estatísticas Atuais</div>
@@ -581,14 +567,9 @@
         <canvas id="monthlyChart"></canvas>
       </div>
 
-    </div><!-- /tab-overview -->
-
-    <!-- ══════════════════════════════════════════════════════════════ -->
-    <!-- TAB: Análise                                                  -->
-    <!-- ══════════════════════════════════════════════════════════════ -->
+    </div>
     <div class="tab-panel" id="tab-analysis">
 
-      <!-- KPIs de análise -->
       <div class="section-title"><i class="fa-solid fa-sliders"></i> Indicadores</div>
       <div class="analysis-kpi-grid" id="analysisKpis">
         <div class="loading">
@@ -596,7 +577,6 @@
         </div>
       </div>
 
-      <!-- Linha 1: Heatmap (wide) -->
       <div class="section-title"><i class="fa-solid fa-fire"></i> Mapa de Calor — Tráfego por Dia</div>
       <div class="chart-card" style="margin-bottom:20px;">
         <div class="chart-header">
@@ -618,7 +598,6 @@
         </div>
       </div>
 
-      <!-- Linha 2: Tendência + Proporção -->
       <div class="analysis-row">
         <div class="chart-card">
           <div class="chart-header">
@@ -641,7 +620,6 @@
         </div>
       </div>
 
-      <!-- Linha 3: Top dias -->
       <div class="section-title"><i class="fa-solid fa-ranking-star"></i> Top 10 — Dias com Mais Tráfego</div>
       <div class="chart-card">
         <table class="top-table" id="topDaysTable">
@@ -667,7 +645,7 @@
         </table>
       </div>
 
-    </div><!-- /tab-analysis -->
+    </div>
   </main>
 
   <script>
@@ -799,9 +777,19 @@
           },
         });
 
-        // ── DADOS DA ABA ANÁLISE (Preenchimento Automatizado) ──────────────
+        // ══════════════════════════════════════════════════════════════
+        // ── RENDERIZAÇÃO DA ABA ANÁLISE (DINÂMICA)
+        // ══════════════════════════════════════════════════════════════
+        const totalRx = data.days.reduce((acc, d) => acc + Number(d.rx), 0);
+        const totalTx = data.days.reduce((acc, d) => acc + Number(d.tx), 0);
 
-        // 1. Alimentar a Tabela de Top 10 dias se os dados existirem no JSON
+        // 1. Indicadores (KPIs Superiores)
+        document.getElementById('analysisKpis').innerHTML = `
+          <div class="kpi-card"><div class="kpi-label">Média Diária</div><div class="kpi-value" style="color:var(--accent)">${formatBytes((totalRx + totalTx) / (data.days.length || 1))}</div></div>
+          <div class="kpi-card"><div class="kpi-label">Dias Monitorados</div><div class="kpi-value">${data.days.length} dias</div></div>
+        `;
+
+        // 2. Tabela de Top 10 dias
         if (data.top_days || data.top) {
           const topDays = data.top_days || data.top;
           const maxTotal = Math.max(...topDays.map(d => (Number(d.rx) + Number(d.tx))), 1);
@@ -818,21 +806,17 @@
                     <div class="bar-fill" style="width: ${percentage}%"></div>
                   </div>
                 </td>
-                <td class="rx">${d.rx_fmt || formatBytes(d.rx)}</td>
-                <td class="tx">${d.tx_fmt || formatBytes(d.tx)}</td>
+                <td style="color: var(--rx)">${d.rx_fmt || formatBytes(d.rx)}</td>
+                <td style="color: var(--tx)">${d.tx_fmt || formatBytes(d.tx)}</td>
                 <td class="top-total">${d.total_fmt || formatBytes(total)}</td>
               </tr>
             `;
           }).join('');
         }
 
-        // 2. Gráfico de Proporção RX/TX (Doughnut)
+        // 3. Gráfico de Proporção (Doughnut)
         const ratioCtx = document.getElementById('ratioChart').getContext('2d');
         if (chartsInstances.ratio) chartsInstances.ratio.destroy();
-
-        const totalRx = data.days.reduce((acc, d) => acc + Number(d.rx), 0);
-        const totalTx = data.days.reduce((acc, d) => acc + Number(d.tx), 0);
-
         chartsInstances.ratio = new Chart(ratioCtx, {
           type: 'doughnut',
           data: {
@@ -848,20 +832,86 @@
             responsive: true,
             maintainAspectRatio: true,
             plugins: {
-              legend: { labels: { color: '#cbd5e1', font: { family: "IBM Plex Mono, monospace", size: 11 } } },
+              legend: { labels: { color: '#cbd5e1', font: { family: "IBM Plex Mono, monospace", size: 11 }, usePointStyle: true } },
               tooltip: { callbacks: { label: ctx => ` ${ctx.label}: ${formatBytes(ctx.raw)}` } }
             }
           }
         });
 
-        // 3. Remover loaders estáticos dos outros indicadores pendentes
-        document.getElementById('analysisKpis').innerHTML = `
-          <div class="kpi-card"><div class="kpi-label">Média Diária</div><div class="kpi-value" style="color:var(--accent)">${formatBytes((totalRx + totalTx) / (data.days.length || 1))}</div></div>
-          <div class="kpi-card"><div class="kpi-label">Dias Monitorados</div><div class="kpi-value">${data.days.length} dias</div></div>
+        // 4. Gráfico de Tendência (Média Móvel de 7 dias)
+        const trendCtx = document.getElementById('trendChart').getContext('2d');
+        if (chartsInstances.trend) chartsInstances.trend.destroy();
+
+        const dailyTotals = data.days.map(d => Number(d.rx) + Number(d.tx));
+        const movingAverages = dailyTotals.map((val, idx, arr) => {
+          const start = Math.max(0, idx - 6);
+          const subset = arr.slice(start, idx + 1);
+          return subset.reduce((a, b) => a + b, 0) / subset.length;
+        });
+
+        chartsInstances.trend = new Chart(trendCtx, {
+          type: 'line',
+          data: {
+            labels: data.days.map(d => d.date),
+            datasets: [
+              {
+                label: 'Volume Diário',
+                data: dailyTotals,
+                borderColor: 'rgba(56, 189, 248, 0.2)',
+                backgroundColor: 'transparent',
+                borderWidth: 1,
+                pointRadius: 0
+              },
+              {
+                label: 'Tendência (Média 7d)',
+                data: movingAverages,
+                borderColor: '#818cf8',
+                backgroundColor: 'transparent',
+                borderWidth: 2,
+                tension: 0.3,
+                pointRadius: 1
+              }
+            ]
+          },
+          options: chartBaseOpts
+        });
+
+        // 5. Geração Dinâmica do Mapa de Calor (Heatmap)
+        const maxDayTotal = Math.max(...data.days.map(d => Number(d.rx) + Number(d.tx)), 1);
+        let hmHtml = `
+          <div class="heatmap-dow">
+            <span>Dom</span><span>Seg</span><span>Ter</span><span>Qua</span><span>Qui</span><span>Sex</span><span>Sáb</span>
+          </div>
+          <div class="heatmap-wrap">
+            <div class="heatmap-grid">
         `;
 
-        // Nota: Se o seu backend não enviar dados de heatmap estruturados, o container do heatmap pode ser limpo aqui:
-        document.getElementById('heatmapOuter').innerHTML = `<div style="color:var(--muted); font-size:12px; font-family:var(--mono);">Mapa de calor integrado ao histórico do vnstat.</div>`;
+        hmHtml += data.days.map(d => {
+          const total = Number(d.rx) + Number(d.tx);
+          const weight = total / maxDayTotal;
+          let bgColor = 'var(--border)'; // Sem tráfego
+
+          if (total > 0) {
+            // Calcula opacidade incremental baseado no uso relativo
+            const alpha = Math.max(0.15, Math.min(weight, 1)).toFixed(2);
+            bgColor = `rgba(56, 189, 248, ${alpha})`;
+          }
+
+          const tip = `${d.date} • Total: ${formatBytes(total)} (↓${formatBytes(d.rx)} ↑${formatBytes(d.tx)})`;
+          return `<div class="hm-cell" style="background: ${bgColor}" data-tip="${tip}"></div>`;
+        }).join('');
+
+        hmHtml += `</div></div>`;
+        document.getElementById('heatmapOuter').innerHTML = hmHtml;
+
+        // Renderiza quadradinhos da legenda do Heatmap (apenas uma vez)
+        const legendCells = document.getElementById('heatmapLegendCells');
+        if (legendCells) {
+          legendCells.innerHTML = [0, 0.25, 0.5, 0.75, 1].map(v => {
+            const bg = v === 0 ? 'var(--border)' : `rgba(56, 189, 248, ${v})`;
+            return `<div class="hm-legend-cell" style="background: ${bg}"></div>`;
+          }).join('');
+        }
 
       } catch (err) {
         console.error('Load error:', err);
