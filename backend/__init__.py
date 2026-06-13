@@ -2,7 +2,7 @@
 Author: Ser4ph4
 Date: 2026-06-13 04:58:27
 LastEditors: Ser4ph4
-LastEditTime: 2026-06-13 14:14:18
+LastEditTime: 2026-06-13 14:24:56
 '''
 from __future__ import annotations
 import os
@@ -55,14 +55,12 @@ def create_app(config_override: dict | None = None) -> Flask:
     app.register_blueprint(collector_bp, url_prefix="/api/collector")
     app.register_blueprint(pages_bp)
 
-    # ── ROTA EXPLÍCITA DO FAVICON ADICIONADA AQUI ─────────────────────────
-    # Ela vai ler o favicon direto da pasta física que você criou!
-    @app.route('/favicon.ico')
+@app.route('/favicon.svg')
     def favicon():
         return send_from_directory(
             os.path.join(app.root_path, 'static'),
-            'favicon.ico', 
-            mimetype='image/vnd.microsoft.icon'
+            'favicon.svg', 
+            mimetype='image/svg+xml'
         )
 
     # ── First-run seed ────────────────────────────────────────────────────
