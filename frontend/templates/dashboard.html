@@ -519,14 +519,22 @@
             <div class="kpi-value">${data.total_tx_fmt}</div>
             <div class="kpi-subtext">${formatBytes(data.total_tx)}</div>
           </div>
-          <div class="kpi-card">
-            <div class="kpi-header">
-              <div class="kpi-label">Total Mês</div>
-              <i class="fa-solid fa-calendar-days kpi-icon"></i>
-            </div>
-            <div class="kpi-value">${data.month_rx_fmt}</div>
-            <div class="kpi-subtext">↓ + ${data.month_tx_fmt} ↑</div>
-          </div>
+<div class="kpi-card">
+  <div class="kpi-header">
+    <div class="kpi-label">Total Mês</div>
+    <i class="fa-solid fa-calendar-days kpi-icon"></i>
+  </div>
+  <div style="display: flex; gap: 16px; margin-top: 6px;">
+    <div style="flex: 1;">
+      <div class="kpi-value" style="color: var(--rx); font-size: 20px; margin-bottom: 0;">${data.month_rx_fmt}</div>
+      <div class="kpi-subtext" style="font-size: 11px; margin-top: 2px; color: var(--muted);"><i class="fa-solid fa-arrow-down" style="color: var(--rx);"></i> Down</div>
+    </div>
+    <div style="flex: 1; border-left: 1px solid var(--border); padding-left: 16px;">
+      <div class="kpi-value" style="color: var(--tx); font-size: 20px; margin-bottom: 0;">${data.month_tx_fmt}</div>
+      <div class="kpi-subtext" style="font-size: 11px; margin-top: 2px; color: var(--muted);"><i class="fa-solid fa-arrow-up" style="color: var(--tx);"></i> Up</div>
+    </div>
+  </div>
+</div>
         `;
 
         // Host cards
