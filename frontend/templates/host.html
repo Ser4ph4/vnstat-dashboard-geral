@@ -336,54 +336,82 @@
       grid-template-columns: 1fr;
     }
 
-    /* ── HEATMAP UNIFICADO (CORRIGIDO) ──────────────────────────────── */
-    .heatmap-outer {
-      background: rgba(15, 21, 32, 0.3);
-      padding: 16px;
-      border-radius: 12px;
-      border: 1px solid rgba(30, 41, 59, 0.6);
-      width: 100%;
-    }
-
-    .heatmap-inner-layout {
+    .chart-header-left {
       display: flex;
-      align-items: flex-start;
+      align-items: center;
+      gap: 8px;
     }
 
-    .heatmap-wrap {
-      overflow-x: auto;
+    .chart-badge {
+      font-size: 10px;
+      font-family: var(--mono);
+      padding: 2px 7px;
+      border-radius: 4px;
+      background: var(--border);
+      color: var(--muted);
+    }
+
+    /* ── CALENDAR HEATMAP SÉMETRICO (CORRIGIDO) ─────────────────────── */
+    .heatmap-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
       width: 100%;
+      padding: 12px 0;
     }
 
-    /* 8 Linhas: Linha 1 para os Meses (14px) + 7 Linhas para os Dias (18px) */
+    .heatmap-header-days {
+      display: grid;
+      grid-template-columns: repeat(7, 40px);
+      gap: 6px;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+
+    .heatmap-header-days span {
+      font-size: 11px;
+      font-family: var(--mono);
+      color: var(--muted);
+      font-weight: 500;
+      text-transform: uppercase;
+    }
+
     .heatmap-grid {
       display: grid;
-      grid-template-rows: 14px repeat(7, 18px);
-      grid-auto-flow: column;
-      grid-auto-columns: 18px;
-      gap: 4px;
-      width: max-content;
+      grid-template-columns: repeat(7, 40px);
+      gap: 6px;
     }
 
     .hm-cell {
-      width: 18px;
-      height: 18px;
-      border-radius: 3px;
-      background: var(--border);
-      transition: transform .1s;
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      background: rgba(30, 41, 59, 0.2);
+      border: 1px solid var(--border);
+      transition: transform 0.1s, border-color 0.1s;
       cursor: default;
       position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
     .hm-cell:hover {
-      transform: scale(1.3);
+      transform: scale(1.15);
       z-index: 10;
+      border-color: var(--accent);
+    }
+
+    .hm-cell-num {
+      font-size: 11px;
+      font-family: var(--mono);
+      pointer-events: none;
     }
 
     .hm-cell[data-tip]:hover::after {
       content: attr(data-tip);
       position: absolute;
-      bottom: calc(100% + 6px);
+      bottom: calc(100% + 8px);
       left: 50%;
       transform: translateX(-50%);
       white-space: nowrap;
@@ -391,20 +419,20 @@
       border: 1px solid var(--border);
       color: var(--text);
       font-family: var(--mono);
-      font-size: 10px;
-      padding: 4px 8px;
-      border-radius: 4px;
+      font-size: 11px;
+      padding: 6px 10px;
+      border-radius: 6px;
       pointer-events: none;
       z-index: 100;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
     }
 
     .heatmap-legend {
       display: flex;
       align-items: center;
-      gap: 6px;
-      margin-top: 16px;
-      font-size: 10px;
+      gap: 8px;
+      margin-top: 20px;
+      font-size: 11px;
       color: var(--muted);
       font-family: var(--mono);
     }
@@ -417,26 +445,8 @@
     .hm-legend-cell {
       width: 14px;
       height: 14px;
-      border-radius: 2px;
-    }
-
-    .heatmap-dow {
-      display: grid;
-      grid-template-rows: repeat(7, 18px);
-      gap: 4px;
-      margin-top: 18px;
-      /* Pula exatamente o espaço da linha de meses */
-      margin-right: 12px;
-      flex-shrink: 0;
-    }
-
-    .heatmap-dow span {
-      font-size: 10px;
-      font-family: var(--mono);
-      color: var(--muted);
-      display: flex;
-      align-items: center;
-      line-height: 1;
+      border-radius: 3px;
+      border: 1px solid rgba(255, 255, 255, 0.03);
     }
 
     /* ── Top Days Table ─────────────────────────────────────────────── */
@@ -570,35 +580,30 @@
         </div>
       </div>
 
-      <div class="section-title"><i class="fa-solid fa-fire"></i> Mapa de Calor — Tráfego por Dia</div>
+      <div class="section-title"><i class="fa-solid fa-calendar-days"></i> Distribuição de Tráfego Mensal</div>
       <div class="chart-card" style="margin-bottom:20px;">
         <div class="chart-header">
           <div class="chart-header-left">
-            <i class="fa-solid fa-calendar-week" style="color:var(--muted);font-size:13px;"></i>
-            <span class="chart-title" style="font-size:13px;">Atividade Recente</span>
+            <i class="fa-solid fa-circle-dot" style="color:var(--accent);font-size:10px;"></i>
+            <span class="chart-title" style="font-size:13px;">Intensidade de Tráfego Diário (Últimos 30 dias)</span>
           </div>
           <span class="chart-badge" id="heatmapLegendLabel">RX + TX</span>
         </div>
 
-        <div class="heatmap-outer">
-          <div class="heatmap-inner-layout">
-            <div class="heatmap-dow">
-              <span>Dom</span><span>Seg</span><span>Ter</span><span>Qua</span><span>Qui</span><span>Sex</span><span>Sáb</span>
-            </div>
-            <div class="heatmap-wrap">
-              <div class="heatmap-grid" id="heatmapGrid">
-                <div class="loading">
-                  <div class="spinner"></div> Carregando...
-                </div>
-              </div>
+        <div class="heatmap-container">
+          <div class="heatmap-header-days">
+            <span>Dom</span><span>Seg</span><span>Ter</span><span>Qua</span><span>Qui</span><span>Sex</span><span>Sáb</span>
+          </div>
+          <div class="heatmap-grid" id="heatmapGrid">
+            <div class="loading">
+              <div class="spinner"></div> Carregando...
             </div>
           </div>
-        </div>
-
-        <div class="heatmap-legend">
-          Menos
-          <div class="heatmap-legend-cells" id="heatmapLegendCells"></div>
-          Mais
+          <div class="heatmap-legend">
+            Menos
+            <div class="heatmap-legend-cells" id="heatmapLegendCells"></div>
+            Mais
+          </div>
         </div>
       </div>
 
@@ -782,7 +787,7 @@
         });
 
         // ══════════════════════════════════════════════════════════════
-        // ── RENDERIZAÇÃO DA ABA ANÁLISE (CORRIGIDA)
+        // ── RENDERIZAÇÃO DA ABA ANÁLISE (100% DINÂMICA)
         // ══════════════════════════════════════════════════════════════
         const totalRx = data.days.reduce((acc, d) => acc + Number(d.rx), 0);
         const totalTx = data.days.reduce((acc, d) => acc + Number(d.tx), 0);
@@ -793,7 +798,7 @@
           <div class="kpi-card"><div class="kpi-label">Dias Monitorados</div><div class="kpi-value">${data.days.length} dias</div></div>
         `;
 
-        // 2. CORREÇÃO SOLUÇÃO DO TOP 10 (Gera o ranking local se a chave da API faltar)
+        // 2. CORREÇÃO GARANTIDA DO TOP 10 (Gera o ranking local se a chave da API faltar)
         const sortedDays = data.top_days || data.top || [...data.days].sort((a, b) => (Number(b.rx) + Number(b.tx)) - (Number(a.rx) + Number(a.tx)));
         if (sortedDays && sortedDays.length > 0) {
           const maxTotal = Math.max(...sortedDays.map(d => (Number(d.rx) + Number(d.tx))), 1);
@@ -865,64 +870,42 @@
           options: chartBaseOpts
         });
 
-        // 5. CORREÇÃO CRÍTICA DO HEATMAP UNIFICADO (Alinhamento Perfeito Semanal)
+        // 5. CORREÇÃO COMPLETA: Geração do Heatmap em Formato Calendário Sétrico (Estilo Desktop Widget)
         const firstDateStr = data.days[0]?.date;
         const firstDayOfWeek = firstDateStr ? new Date(firstDateStr + 'T00:00:00').getDay() : 0;
 
-        // Estrutura as semanas inserindo células vazias de preenchimento (padding) na primeira semana
-        let cells = [];
-        for (let i = 0; i < firstDayOfWeek; i++) {
-          cells.push({ isPadding: true });
-        }
-        data.days.forEach(d => cells.push({ ...d, isPadding: false }));
-
-        // Agrupa as células em colunas de 7 dias (Semanas completas)
-        let weeks = [];
-        while (cells.length > 0) {
-          weeks.push(cells.splice(0, 7));
-        }
-
-        const monthNames = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
-        let lastMonth = -1;
         let gridHtml = '';
 
-        // Varre cada semana gerando a célula do Mês (linha 0) + as 7 células dos dias (linhas 1 a 7)
-        weeks.forEach(week => {
-          let colMonthLabel = '';
-          for (let day of week) {
-            if (!day.isPadding && day.date) {
-              const m = new Date(day.date + 'T00:00:00').getMonth();
-              if (m !== lastMonth) {
-                colMonthLabel = monthNames[m];
-                lastMonth = m;
-                break;
-              }
-            }
+        // Insere blocos transparentes se o primeiro dia do histórico não for um Domingo
+        for (let i = 0; i < firstDayOfWeek; i++) {
+          gridHtml += `<div style="background: transparent; border: none; pointer-events: none;"></div>`;
+        }
+
+        const maxDayTotal = Math.max(...data.days.map(d => Number(d.rx) + Number(d.tx)), 1);
+
+        gridHtml += data.days.map(d => {
+          const total = Number(d.rx) + Number(d.tx);
+          const weight = total / maxDayTotal;
+          let bgColor = 'rgba(30, 41, 59, 0.15)'; // Cor para dias vazios/sem tráfego
+          let numColor = 'rgba(226, 232, 240, 0.3)'; // Cor do número apagada por padrão
+
+          if (total > 0) {
+            // Calcula opacidade proporcional ao uso
+            const alpha = Math.max(0.20, Math.min(weight, 0.90)).toFixed(2);
+            bgColor = `rgba(56, 189, 248, ${alpha})`;
+            // Inverte a cor do número para preto se o fundo estiver brilhante demais (acima de 0.55 de opacidade)
+            numColor = alpha > 0.55 ? '#0a0e14' : 'var(--text)';
           }
 
-          // Injeta a primeira célula da coluna: O Texto do Mês (Linha 1 do CSS grid)
-          gridHtml += `<span style="font-size: 10px; color: var(--muted); font-family: var(--mono); white-space: nowrap; height: 14px; line-height: 14px;">${colMonthLabel}</span>`;
+          const dayNum = d.date ? d.date.split('-')[2] : '';
+          const tip = `${d.date} • Total: ${formatBytes(total)} (↓${formatBytes(d.rx)} ↑${formatBytes(d.tx)})`;
 
-          // Injeta as 7 células seguintes da mesma coluna (Os blocos de tráfego)
-          week.forEach(c => {
-            if (c.isPadding) {
-              gridHtml += `<div style="background: transparent; border: none; pointer-events: none;"></div>`;
-            } else {
-              const total = Number(c.rx) + Number(c.tx);
-              const maxDayTotal = Math.max(...data.days.map(d => Number(d.rx) + Number(d.tx)), 1);
-              const weight = total / maxDayTotal;
-              let bgColor = 'var(--border)';
-
-              if (total > 0) {
-                const alpha = Math.max(0.2, Math.min(weight, 1)).toFixed(2);
-                bgColor = `rgba(56, 189, 248, ${alpha})`;
-              }
-
-              const tip = `${c.date} • Total: ${formatBytes(total)} (↓${formatBytes(c.rx)} ↑${formatBytes(c.tx)})`;
-              gridHtml += `<div class="hm-cell" style="background: ${bgColor}" data-tip="${tip}"></div>`;
-            }
-          });
-        });
+          return `
+            <div class="hm-cell" style="background: ${bgColor}" data-tip="${tip}">
+              <span class="hm-cell-num" style="color: ${numColor}">${dayNum}</span>
+            </div>
+          `;
+        }).join('');
 
         document.getElementById('heatmapGrid').innerHTML = gridHtml;
 
@@ -930,7 +913,7 @@
         const legendCells = document.getElementById('heatmapLegendCells');
         if (legendCells) {
           legendCells.innerHTML = [0, 0.25, 0.5, 0.75, 1].map(v => {
-            const bg = v === 0 ? 'var(--border)' : `rgba(56, 189, 248, ${v})`;
+            const bg = v === 0 ? 'rgba(30, 41, 59, 0.3)' : `rgba(56, 189, 248, ${v * 0.9})`;
             return `<div class="hm-legend-cell" style="background: ${bg}"></div>`;
           }).join('');
         }
