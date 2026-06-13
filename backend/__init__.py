@@ -2,7 +2,7 @@
 Author: Ser4ph4
 Date: 2026-06-13 04:58:27
 LastEditors: Ser4ph4
-LastEditTime: 2026-06-13 17:12:35
+LastEditTime: 2026-06-13 17:16:48
 '''
 from __future__ import annotations
 import os
@@ -17,19 +17,14 @@ jwt = JWTManager()
 
 
 def create_app(config_override: dict | None = None) -> Flask:
-    # ── Mapeamento Dinâmico de Caminhos Absolutos (Correção para Docker) ──
+    # ── Mapeamento Dinâmico de Caminhos Absolutos ─────────────────────────
     backend_dir = os.path.abspath(os.path.dirname(__file__))
     project_root = os.path.abspath(os.path.join(backend_dir, ".."))
     template_dir = os.path.join(project_root, "frontend", "templates")
     static_dir = os.path.join(project_root, "frontend", "static")
 
-    # CORREÇÃO: Adicionado static_url_path para fixar a rota mapeada no Docker
-    app = Flask(
-        __name__, 
-        template_folder=template_dir, 
-        static_folder=static_dir,
-        static_url_path='/static'
-    )
+    # SOLUÇÃO: Desativamos o static padrão (None) para contornar o bloqueio de Jail do Flask
+    app = Flask(__name__, template_folder=template_dir, static_folder=None)
 
     # ── Core config ─────────────────────────────────────────────────────
     app.config.update(
@@ -66,11 +61,17 @@ def create_app(config_override: dict | None = None) -> Flask:
     app.register_blueprint(collector_bp, url_prefix="/api/collector")
     app.register_blueprint(pages_bp)
 
-    # ── ROTA EXPLÍCITA DO FAVICON (Corrigida para usar a pasta estática real) ──
+    # ── ROTA MANUAL INFALÍVEL PARA OS ARQUIVOS ESTÁTICOS ──────────────────
+    # Mantém o nome do endpoint como 'static' para não quebrar o url_for() do HTML
+    @app.route('/static/<path:filename>', endpoint='static')
+    def serve_static_custom(filename):
+        return send_from_directory(static_dir, filename)
+
+    # ── ROTA EXPLÍCITA DO FAVICON ─────────────────────────────────────────
     @app.route('/favicon.svg')
     def favicon():
         return send_from_directory(
-            app.static_folder,
+            static_dir,
             'favicon.svg', 
             mimetype='image/svg+xml'
         )
