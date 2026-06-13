@@ -1,0 +1,27 @@
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+.env
+.env.local
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+node_modules/
+dist/
+build/
+venv/
+.venv/
+.pytest_cache/
+.coverage
+htmlcov/
+mariadb_data/
+*.log
+.env*.local
+# Banco de dados local do Flask (SQLite)
+instance/
+*.db
+*.sqlite3

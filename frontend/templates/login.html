@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>vnstat — Login</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="icon" type="image/x-icon" href="/favicon.ico?v=1">
+  <link
+    href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg: #0a0e14;
+      --surface: #0f1520;
+      --border: #1e293b;
+      --accent: #38bdf8;
+      --accent2: #818cf8;
+      --text: #e2e8f0;
+      --muted: #64748b;
+      --error: #f87171;
+      --mono: 'IBM Plex Mono', monospace;
+      --sans: 'Inter', sans-serif;
+    }
+
+    html,
+    body {
+      height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+    }
+
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Animated grid background */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(var(--border) 1px, transparent 1px),
+        linear-gradient(90deg, var(--border) 1px, transparent 1px);
+      background-size: 40px 40px;
+      opacity: 0.4;
+      pointer-events: none;
+    }
+
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(ellipse 80% 60% at 50% 40%, #0f172a88 0%, var(--bg) 70%);
+      pointer-events: none;
+    }
+
+    .card {
+      position: relative;
+      z-index: 1;
+      width: 380px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 40px;
+      box-shadow: 0 0 60px rgba(56, 189, 248, 0.1), 0 24px 48px #00000060;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 32px;
+    }
+
+    .logo-icon {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .logo-icon svg {
+      width: 22px;
+      height: 22px;
+    }
+
+    .logo-text {
+      font-family: var(--mono);
+      font-size: 18px;
+      font-weight: 500;
+      letter-spacing: -0.5px;
+    }
+
+    .logo-text span {
+      color: var(--accent);
+    }
+
+    h1 {
+      font-size: 22px;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .subtitle {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 28px;
+    }
+
+    .field {
+      margin-bottom: 16px;
+    }
+
+    .field-group {
+      transition: all 0.3s ease;
+    }
+
+    /* Utilitários de visibilidade controlada por JS */
+    .hidden {
+      display: none !important;
+    }
+
+    label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 6px;
+      font-family: var(--mono);
+    }
+
+    label i {
+      font-size: 11px;
+    }
+
+    input {
+      width: 100%;
+      background: #060a10;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 11px 14px;
+      font-size: 14px;
+      font-family: var(--mono);
+      color: var(--text);
+      outline: none;
+      transition: border-color .2s, box-shadow .2s;
+    }
+
+    input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.13);
+    }
+
+    /* Campo 2FA destacado */
+    input#token2fa {
+      letter-spacing: 0.3em;
+      text-align: center;
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--accent);
+    }
+
+    input#token2fa::placeholder {
+      letter-spacing: normal;
+      font-size: 14px;
+      font-weight: 400;
+    }
+
+    .btn {
+      width: 100%;
+      margin-top: 8px;
+      padding: 12px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border: none;
+      border-radius: 8px;
+      color: #000;
+      font-size: 14px;
+      font-weight: 600;
+      font-family: var(--sans);
+      cursor: pointer;
+      transition: opacity .2s, transform .1s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn:hover {
+      opacity: .9;
+    }
+
+    .btn:active {
+      transform: scale(.98);
+    }
+
+    .btn:disabled {
+      opacity: .5;
+      cursor: not-allowed;
+    }
+
+    .btn .spinner {
+      width: 16px;
+      height: 16px;
+      border: 2px solid #00000040;
+      border-top-color: #000;
+      border-radius: 50%;
+      animation: spin .6s linear infinite;
+      display: none;
+    }
+
+    .btn.loading .spinner {
+      display: block;
+    }
+
+    .btn.loading .btn-text {
+      display: none;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .error-msg {
+      margin-top: 14px;
+      padding: 10px 14px;
+      background: rgba(248, 113, 113, 0.08);
+      border: 1px solid rgba(248, 113, 113, 0.2);
+      border-radius: 8px;
+      font-size: 13px;
+      color: var(--error);
+      display: none;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .error-msg.show {
+      display: flex;
+    }
+
+    .footer {
+      margin-top: 24px;
+      text-align: center;
+      font-size: 12px;
+      color: var(--muted);
+      font-family: var(--mono);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="card">
+    <div class="logo">
+      <div class="logo-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2" stroke-linecap="round">
+          <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+        </svg>
+      </div>
+      <div class="logo-text">vn<span>dash</span></div>
+    </div>
+
+    <h1>Acesso ao painel</h1>
+    <p class="subtitle" id="formSubtitle">Monitoramento de tráfego de rede</p>
+
+    <div id="stepCredentials" class="field-group">
+      <div class="field">
+        <label><i class="fa-solid fa-user"></i> Usuário</label>
+        <input type="text" id="username" autocomplete="username" placeholder="admin" autofocus />
+      </div>
+
+      <div class="field">
+        <label><i class="fa-solid fa-lock"></i> Senha</label>
+        <input type="password" id="password" autocomplete="current-password" placeholder="••••••••" />
+      </div>
+    </div>
+
+    <div id="step2FA" class="field-group hidden">
+      <div class="field">
+        <label><i class="fa-solid fa-shield-halved"></i> Código de Segurança (2FA)</label>
+        <input type="text" id="token2fa" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="000000"
+          autocomplete="one-time-code" />
+      </div>
+    </div>
+
+    <button class="btn" id="loginBtn" onclick="handleSubmit()">
+      <div class="spinner"></div>
+      <span class="btn-text" id="btnText">Entrar</span>
+    </button>
+
+    <div class="error-msg" id="errorMsg"></div>
+
+    <p class="footer">vnstat-dashboard v1.0</p>
+  </div>
+
+  <script>
+    const usernameEl = document.getElementById('username');
+    const passwordEl = document.getElementById('password');
+    const token2faEl = document.getElementById('token2fa');
+    const loginBtn = document.getElementById('loginBtn');
+    const btnText = document.getElementById('btnText');
+    const errorMsg = document.getElementById('errorMsg');
+    const formSubtitle = document.getElementById('formSubtitle');
+
+    const stepCredentials = document.getElementById('stepCredentials');
+    const step2FA = document.getElementById('step2FA');
+
+    let requires2FA = false;
+
+    // Escuta teclas Enter em todos os inputs relevantes
+    [usernameEl, passwordEl, token2faEl].forEach(el =>
+      el.addEventListener('keydown', e => { if (e.key === 'Enter') handleSubmit(); })
+    );
+
+    // Gerencia o envio com base no estado do fluxo (senha ou token)
+    function handleSubmit() {
+      if (!requires2FA) {
+        doLoginStage1();
+      } else {
+        doLoginStage2();
+      }
+    }
+
+    // Validação inicial do usuário/senha
+    async function doLoginStage1() {
+      clearError();
+      setLoading(true);
+
+      try {
+        const res = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            username: usernameEl.value.trim(),
+            password: passwordEl.value,
+          }),
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) throw new Error(data.error || 'Erro desconhecido');
+
+        // Se o backend avisar que precisa de 2FA
+        if (data.requires_2fa) {
+          requires2FA = true;
+          stepCredentials.classList.add('hidden');
+          step2FA.classList.remove('hidden');
+          formSubtitle.textContent = "Insira o token do seu aplicativo autenticador.";
+          btnText.textContent = "Verificar Token";
+          token2faEl.focus();
+        } else {
+          // Caso a conta não possua 2FA configurado, entra direto
+          window.location.href = '/dashboard';
+        }
+      } catch (err) {
+        showError(err.message);
+        passwordEl.value = '';
+        passwordEl.focus();
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    // Validação do Token TOTP
+    async function doLoginStage2() {
+      clearError();
+      if (token2faEl.value.trim().length !== 6) {
+        showError("O código deve conter 6 dígitos.");
+        return;
+      }
+
+      setLoading(true);
+
+      try {
+        const res = await fetch('/api/auth/verify-2fa', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            username: usernameEl.value.trim(),
+            token: token2faEl.value.trim()
+          }),
+        });
+
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Token inválido ou expirado');
+
+        window.location.href = '/dashboard';
+      } catch (err) {
+        showError(err.message);
+        token2faEl.value = '';
+        token2faEl.focus();
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    function setLoading(isLoading) {
+      loginBtn.disabled = isLoading;
+      if (isLoading) {
+        loginBtn.classList.add('loading');
+      } else {
+        loginBtn.classList.remove('loading');
+      }
+    }
+
+    function showError(msg) {
+      errorMsg.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> ${msg}`;
+      errorMsg.classList.add('show');
+    }
+
+    function clearError() {
+      errorMsg.classList.remove('show');
+    }
+  </script>
+</body>
+
+</html>

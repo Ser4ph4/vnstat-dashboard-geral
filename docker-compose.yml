@@ -1,0 +1,57 @@
+services:
+  vnstat-db:
+    image: mariadb:11.1
+    container_name: vnstat-db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: vnstat_dash
+      MYSQL_USER: vnstat
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    volumes:
+      - ./db/schema.sql:/docker-entrypoint-initdb.d/10-schema.sql
+      - mariadb_data:/var/lib/mysql
+    ports:
+      - "127.0.0.1:3356:3306"
+    networks:
+      - vnstat
+    healthcheck:
+      test:
+        ["CMD-SHELL", "mariadb-admin ping -u $$MYSQL_USER -p$$MYSQL_PASSWORD"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  # Flask backend
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: vnstat-app
+    restart: unless-stopped
+    environment:
+      FLASK_ENV: ${FLASK_ENV}
+      SECRET_KEY: ${SECRET_KEY}
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+      DATABASE_URL: ${DATABASE_URL}
+      COLLECTOR_API_KEY: ${COLLECTOR_API_KEY}
+      ADMIN_USER: ${ADMIN_USER}
+      ADMIN_PASS: ${ADMIN_PASS}
+      HOSTS: ${HOSTS}
+    depends_on:
+      vnstat-db:
+        condition: service_healthy
+    networks:
+      - vnstat
+      - ngxin-proxy-oracle_default
+    expose:
+      - "5000"
+
+volumes:
+  mariadb_data:
+
+networks:
+  vnstat:
+    driver: bridge
+  ngxin-proxy-oracle_default:
+    external: true

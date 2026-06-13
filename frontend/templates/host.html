@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>vnstat — Dashboard</title>
+  <link rel="icon" type="image/x-icon" href="/favicon.ico?v=1">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg: #0a0e14;
+      --surface: #0f1520;
+      --surface2: #151d2b;
+      --border: #1e293b;
+      --accent: #38bdf8;
+      --accent3: #818cf8;
+      --text: #e2e8f0;
+      --text-dim: #cbd5e1;
+      --muted: #64748b;
+      --rx: #38bdf8;
+      --tx: #f472b6;
+      --mono: 'IBM Plex Mono', monospace;
+      --sans: 'Inter', sans-serif;
+    }
+
+    html,
+    body {
+      height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Grid & Radial background */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(var(--border) 1px, transparent 1px),
+        linear-gradient(90deg, var(--border) 1px, transparent 1px);
+      background-size: 40px 40px;
+      opacity: 0.3;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(ellipse 100% 80% at 50% 0%, #0f172a44 0%, transparent 60%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    header {
+      position: relative;
+      z-index: 10;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 16px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .btn-back {
+      padding: 8px 14px;
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text);
+      font-size: 12px;
+      font-weight: 500;
+      font-family: var(--mono);
+      cursor: pointer;
+      transition: all .2s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-back:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      box-shadow: 0 0 15px rgba(56, 189, 248, 0.1);
+    }
+
+    .host-title {
+      font-size: 16px;
+      font-weight: 600;
+      font-family: var(--mono);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .host-title i {
+      color: var(--accent);
+      font-size: 14px;
+    }
+
+    main {
+      position: relative;
+      z-index: 1;
+      flex: 1;
+      padding: 24px;
+      max-width: 1480px;
+      margin: 0 auto;
+      width: 100%;
+
+    }
+
+    .section-title {
+      font-size: 14px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      margin: 32px 0 16px 0;
+      font-family: var(--mono);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .section-title:first-child {
+      margin-top: 0;
+    }
+
+    /* ── KPI Grid ───────────────────────────────────────────────────── */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .kpi-card {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      transition: all .2s;
+    }
+
+    .kpi-card:hover {
+      border-color: var(--accent);
+      box-shadow: 0 0 20px rgba(56, 189, 248, 0.15);
+    }
+
+    .kpi-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .kpi-label {
+      font-size: 11px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      font-family: var(--mono);
+    }
+
+    .kpi-icon {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .kpi-card:hover .kpi-icon {
+      color: var(--accent);
+    }
+
+    .kpi-value {
+      font-size: 20px;
+      font-weight: 600;
+      font-family: var(--mono);
+      letter-spacing: -0.5px;
+    }
+
+    .kpi-value.rx {
+      color: var(--rx);
+    }
+
+    .kpi-value.tx {
+      color: var(--tx);
+    }
+
+    /* ── Charts ────────────────────────────────────────────────────── */
+    .chart-card {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 24px;
+    }
+
+    .chart-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .chart-title {
+      font-size: 14px;
+      font-weight: 600;
+      font-family: var(--mono);
+    }
+
+    .chart-header i {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    canvas {
+      max-height: 300px;
+    }
+
+    /* ── Loading Spinner ────────────────────────────────────────────── */
+    .loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 12px;
+      width: 100%;
+      padding: 20px 0;
+    }
+
+    .spinner {
+      width: 16px;
+      height: 16px;
+      border: 2px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin .6s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    @media (max-width: 768px) {
+      main {
+        padding: 16px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="header-left">
+      <button class="btn-back" onclick="window.history.back()">
+        <i class="fa-solid fa-arrow-left"></i> Voltar
+      </button>
+      <div class="host-title" id="hostTitle">
+        <i class="fa-solid fa-server"></i> —
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="section-title"><i class="fa-solid fa-gauge-high"></i> Estatísticas Atuais</div>
+    <div class="kpi-grid" id="kpiGrid">
+      <div class="loading">
+        <div class="spinner"></div> Carregando...
+      </div>
+    </div>
+
+    <div class="section-title"><i class="fa-solid fa-calendar-day"></i> Últimos 30 dias</div>
+    <div class="chart-card">
+      <div class="chart-header">
+        <i class="fa-solid fa-chart-bar"></i>
+        <div class="chart-title">Tráfego Diário</div>
+      </div>
+      <canvas id="dailyChart"></canvas>
+    </div>
+
+    <div class="section-title"><i class="fa-solid fa-calendar-days"></i> Últimos 12 meses</div>
+    <div class="chart-card">
+      <div class="chart-header">
+        <i class="fa-solid fa-chart-line"></i>
+        <div class="chart-title">Tráfego Mensal</div>
+      </div>
+      <canvas id="monthlyChart"></canvas>
+    </div>
+  </main>
+
+  <script>
+    const hostName = new URLSearchParams(window.location.search).get('h') ||
+      window.location.pathname.split('/').pop();
+    let chartsInstances = {};
+
+    document.addEventListener('DOMContentLoaded', () => {
+      loadHostDetail();
+      setInterval(loadHostDetail, 30000);
+    });
+
+    async function loadHostDetail() {
+      try {
+        const res = await fetch(`/api/host/${hostName}`);
+        const data = await res.json();
+
+        document.getElementById('hostTitle').innerHTML = `<i class="fa-solid fa-server"></i> ${data.host.display_name}`;
+
+        const c = data.current || {};
+        document.getElementById('kpiGrid').innerHTML = `
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <div class="kpi-label">Total Recebido</div>
+              <i class="fa-solid fa-cloud-arrow-down kpi-icon"></i>
+            </div>
+            <div class="kpi-value rx">${c.rx_total_fmt || '—'}</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <div class="kpi-label">Total Enviado</div>
+              <i class="fa-solid fa-cloud-arrow-up kpi-icon"></i>
+            </div>
+            <div class="kpi-value tx">${c.tx_total_fmt || '—'}</div>
+          </div>
+        `;
+
+        const chartBaseOpts = {
+          responsive: true,
+          maintainAspectRatio: true,
+          plugins: {
+            legend: { labels: { color: '#cbd5e1', font: { family: "IBM Plex Mono, monospace", size: 11 }, padding: 16, usePointStyle: true } },
+            tooltip: {
+              backgroundColor: '#0f172a',
+              borderColor: '#38bdf8',
+              borderWidth: 1,
+              titleFont: { family: "IBM Plex Mono, monospace", size: 12 },
+              bodyFont: { family: "IBM Plex Mono, monospace", size: 11 },
+              callbacks: { label: ctx => `${ctx.dataset.label}: ${formatBytes(ctx.parsed.y)}` },
+            },
+          },
+          scales: {
+            x: { grid: { color: '#1e293b' }, ticks: { color: '#64748b', font: { family: "IBM Plex Mono, monospace", size: 10 } } },
+            y: {
+              grid: { color: '#1e293b' },
+              ticks: { color: '#64748b', font: { family: "IBM Plex Mono, monospace", size: 10 }, callback: v => formatBytes(v) },
+            },
+          },
+        };
+
+        // Daily Chart
+        const dailyCtx = document.getElementById('dailyChart').getContext('2d');
+        if (chartsInstances.daily) chartsInstances.daily.destroy();
+        chartsInstances.daily = new Chart(dailyCtx, {
+          type: 'bar',
+          data: {
+            labels: data.days.map(d => d.date),
+            datasets: [
+              {
+                label: 'Download (↓)',
+                data: data.days.map(d => d.rx),
+                backgroundColor: '#38bdf8cc',
+                borderColor: '#38bdf8',
+                borderWidth: 1,
+                borderRadius: 3,
+              },
+              {
+                label: 'Upload (↑)',
+                data: data.days.map(d => d.tx),
+                backgroundColor: '#f472b6cc',
+                borderColor: '#f472b6',
+                borderWidth: 1,
+                borderRadius: 3,
+              },
+            ],
+          },
+          options: {
+            ...chartBaseOpts,
+            interaction: { mode: 'index', intersect: false },
+          },
+        });
+
+        // Monthly Chart
+        const monthlyCtx = document.getElementById('monthlyChart').getContext('2d');
+        if (chartsInstances.monthly) chartsInstances.monthly.destroy();
+        chartsInstances.monthly = new Chart(monthlyCtx, {
+          type: 'line',
+          data: {
+            labels: data.months.map(m => m.label),
+            datasets: [
+              {
+                label: 'Download (↓)',
+                data: data.months.map(m => m.rx),
+                borderColor: '#38bdf8',
+                backgroundColor: '#38bdf81a',
+                borderWidth: 2,
+                fill: true,
+                tension: 0.4,
+                pointRadius: 4,
+                pointHoverRadius: 6,
+              },
+              {
+                label: 'Upload (↑)',
+                data: data.months.map(m => m.tx),
+                borderColor: '#f472b6',
+                backgroundColor: '#f472b61a',
+                borderWidth: 2,
+                fill: true,
+                tension: 0.4,
+                pointRadius: 4,
+                pointHoverRadius: 6,
+              },
+            ],
+          },
+          options: {
+            ...chartBaseOpts,
+            interaction: { mode: 'index', intersect: false },
+          },
+        });
+      } catch (err) {
+        console.error('Load error:', err);
+      }
+    }
+
+    function formatBytes(bytes) {
+      if (!bytes) return '0 B';
+      const k = 1024;
+      const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
+      const i = Math.floor(Math.log(bytes) / Math.log(k));
+      return (bytes / Math.pow(k, i)).toFixed(1) + ' ' + sizes[i];
+    }
+  </script>
+</body>
+
+</html>
