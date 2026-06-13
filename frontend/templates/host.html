@@ -4,11 +4,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>vnstat — Dashboard</title>
+  <title>vnstat — Host</title>
   <link rel="icon" type="image/x-icon" href="/favicon.ico?v=1">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link
-    href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap"
+    href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@400;500;600&display=swap"
     rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
@@ -23,23 +23,29 @@
 
     :root {
       --bg: #0a0e14;
-      --surface: #0f1520;
-      --surface2: #151d2b;
+      --surface: #0d1117;
+      --surface2: #111827;
+      --surface3: #1a2233;
       --border: #1e293b;
+      --border-subtle: #162032;
       --accent: #38bdf8;
+      --accent-glow: rgba(56, 189, 248, 0.12);
       --accent3: #818cf8;
       --text: #e2e8f0;
-      --text-dim: #cbd5e1;
-      --muted: #64748b;
+      --text-dim: #94a3b8;
+      --muted: #475569;
       --rx: #38bdf8;
       --tx: #f472b6;
+      --rx-glow: rgba(56, 189, 248, 0.08);
+      --tx-glow: rgba(244, 114, 182, 0.08);
       --mono: 'IBM Plex Mono', monospace;
       --sans: 'Inter', sans-serif;
+      --radius: 10px;
     }
 
     html,
     body {
-      height: 100%;
+      min-height: 100%;
       background: var(--bg);
       color: var(--text);
       font-family: var(--sans);
@@ -50,57 +56,60 @@
       flex-direction: column;
     }
 
-    /* Grid & Radial background */
+    /* Subtle grid */
     body::before {
       content: '';
       position: fixed;
       inset: 0;
       background-image:
-        linear-gradient(var(--border) 1px, transparent 1px),
-        linear-gradient(90deg, var(--border) 1px, transparent 1px);
-      background-size: 40px 40px;
-      opacity: 0.3;
+        linear-gradient(rgba(30, 41, 59, 0.4) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(30, 41, 59, 0.4) 1px, transparent 1px);
+      background-size: 48px 48px;
       pointer-events: none;
       z-index: 0;
     }
 
+    /* Radial top glow */
     body::after {
       content: '';
       position: fixed;
       inset: 0;
-      background: radial-gradient(ellipse 100% 80% at 50% 0%, #0f172a44 0%, transparent 60%);
+      background: radial-gradient(ellipse 70% 40% at 50% -5%, rgba(56, 189, 248, 0.06) 0%, transparent 70%);
       pointer-events: none;
       z-index: 0;
     }
 
+    /* ── Header ─────────────────────────────────────────────────────── */
     header {
       position: relative;
       z-index: 10;
-      background: var(--surface);
+      background: rgba(13, 17, 23, 0.95);
       border-bottom: 1px solid var(--border);
-      padding: 16px 24px;
+      padding: 0 24px;
+      height: 56px;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      backdrop-filter: blur(8px);
     }
 
     .header-left {
       display: flex;
       align-items: center;
-      gap: 16px;
+      gap: 14px;
     }
 
     .btn-back {
-      padding: 8px 14px;
+      padding: 7px 13px;
       background: transparent;
       border: 1px solid var(--border);
       border-radius: 6px;
-      color: var(--text);
-      font-size: 12px;
+      color: var(--text-dim);
+      font-size: 11px;
       font-weight: 500;
       font-family: var(--mono);
       cursor: pointer;
-      transition: all .2s;
+      transition: border-color .15s, color .15s, box-shadow .15s;
       display: flex;
       align-items: center;
       gap: 6px;
@@ -109,102 +118,180 @@
     .btn-back:hover {
       border-color: var(--accent);
       color: var(--accent);
-      box-shadow: 0 0 15px rgba(56, 189, 248, 0.1);
+      box-shadow: 0 0 12px var(--accent-glow);
     }
 
     .host-title {
-      font-size: 16px;
+      font-size: 14px;
       font-weight: 600;
       font-family: var(--mono);
       display: flex;
       align-items: center;
       gap: 8px;
+      color: var(--text);
     }
 
     .host-title i {
       color: var(--accent);
-      font-size: 14px;
+      font-size: 13px;
     }
 
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #22c55e;
+      box-shadow: 0 0 6px rgba(34, 197, 94, 0.6);
+      animation: pulse-dot 2.5s ease-in-out infinite;
+    }
+
+    .status-label {
+      font-size: 11px;
+      font-family: var(--mono);
+      color: var(--muted);
+    }
+
+    @keyframes pulse-dot {
+
+      0%,
+      100% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: 0.5;
+      }
+    }
+
+    /* ── Main ───────────────────────────────────────────────────────── */
     main {
       position: relative;
       z-index: 1;
       flex: 1;
-      padding: 24px;
-      max-width: 1480px;
+      padding: 28px 24px;
+      max-width: 1440px;
       margin: 0 auto;
       width: 100%;
-
     }
 
-    .section-title {
-      font-size: 14px;
+    .section-label {
+      font-size: 10px;
       font-weight: 600;
       text-transform: uppercase;
-      letter-spacing: 0.1em;
+      letter-spacing: 0.14em;
       color: var(--muted);
-      margin: 32px 0 16px 0;
+      margin: 32px 0 14px;
       font-family: var(--mono);
       display: flex;
       align-items: center;
       gap: 8px;
     }
 
-    .section-title:first-child {
+    .section-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border-subtle);
+    }
+
+    .section-label:first-child {
       margin-top: 0;
     }
 
     /* ── KPI Grid ───────────────────────────────────────────────────── */
     .kpi-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 12px;
-      margin-bottom: 24px;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 10px;
+      margin-bottom: 8px;
     }
 
     .kpi-card {
       background: var(--surface2);
       border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 16px;
-      transition: all .2s;
+      border-radius: var(--radius);
+      padding: 16px 18px;
+      transition: border-color .2s, box-shadow .2s, background .2s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .kpi-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      transition: opacity .2s;
+    }
+
+    .kpi-card.rx-card::before {
+      background: var(--rx-glow);
+    }
+
+    .kpi-card.tx-card::before {
+      background: var(--tx-glow);
+    }
+
+    .kpi-card:hover::before {
+      opacity: 1;
     }
 
     .kpi-card:hover {
-      border-color: var(--accent);
-      box-shadow: 0 0 20px rgba(56, 189, 248, 0.15);
+      border-color: var(--border);
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+    }
+
+    .kpi-card.rx-card:hover {
+      border-color: var(--rx);
+    }
+
+    .kpi-card.tx-card:hover {
+      border-color: var(--tx);
     }
 
     .kpi-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 8px;
+      margin-bottom: 10px;
     }
 
     .kpi-label {
-      font-size: 11px;
-      font-weight: 500;
+      font-size: 10px;
+      font-weight: 600;
       text-transform: uppercase;
-      letter-spacing: 0.08em;
+      letter-spacing: 0.1em;
       color: var(--muted);
       font-family: var(--mono);
     }
 
     .kpi-icon {
-      font-size: 13px;
+      font-size: 12px;
       color: var(--muted);
+      transition: color .2s;
     }
 
-    .kpi-card:hover .kpi-icon {
-      color: var(--accent);
+    .kpi-card.rx-card:hover .kpi-icon {
+      color: var(--rx);
+    }
+
+    .kpi-card.tx-card:hover .kpi-icon {
+      color: var(--tx);
     }
 
     .kpi-value {
-      font-size: 20px;
+      font-size: 22px;
       font-weight: 600;
       font-family: var(--mono);
       letter-spacing: -0.5px;
+      line-height: 1;
+      margin-bottom: 5px;
     }
 
     .kpi-value.rx {
@@ -215,43 +302,200 @@
       color: var(--tx);
     }
 
-    /* ── Charts ────────────────────────────────────────────────────── */
+    .kpi-sub {
+      font-size: 11px;
+      color: var(--muted);
+      font-family: var(--mono);
+    }
+
+    /* ── Chart Cards ────────────────────────────────────────────────── */
     .chart-card {
       background: var(--surface2);
       border: 1px solid var(--border);
-      border-radius: 12px;
+      border-radius: var(--radius);
       padding: 20px;
-      margin-bottom: 24px;
+      margin-bottom: 16px;
     }
 
     .chart-header {
       display: flex;
       align-items: center;
+      justify-content: space-between;
+      margin-bottom: 18px;
+    }
+
+    .chart-header-left {
+      display: flex;
+      align-items: center;
       gap: 8px;
-      margin-bottom: 16px;
     }
 
     .chart-title {
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 600;
       font-family: var(--mono);
+      color: var(--text);
     }
 
     .chart-header i {
       color: var(--muted);
-      font-size: 13px;
+      font-size: 12px;
+    }
+
+    .chart-badge {
+      font-size: 10px;
+      font-family: var(--mono);
+      color: var(--muted);
+      background: var(--surface3);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 3px 8px;
     }
 
     canvas {
-      max-height: 300px;
+      max-height: 280px;
     }
 
-    /* ── Loading Spinner ────────────────────────────────────────────── */
+    /* ── Footer ─────────────────────────────────────────────────────── */
+    footer {
+      position: relative;
+      z-index: 10;
+      border-top: 1px solid var(--border);
+      background: var(--surface);
+      padding: 0 24px;
+    }
+
+    .footer-inner {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 18px 0;
+    }
+
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr auto;
+      gap: 0;
+      align-items: start;
+    }
+
+    .footer-group {
+      padding: 0 20px;
+      border-right: 1px solid var(--border-subtle);
+    }
+
+    .footer-group:first-child {
+      padding-left: 0;
+    }
+
+    .footer-group:last-child {
+      border-right: none;
+      padding-right: 0;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .footer-group-label {
+      font-size: 9px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--muted);
+      font-family: var(--mono);
+      margin-bottom: 10px;
+    }
+
+    .footer-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      margin-bottom: 4px;
+    }
+
+    .footer-row:last-child {
+      margin-bottom: 0;
+    }
+
+    .footer-key {
+      font-size: 11px;
+      font-family: var(--mono);
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    .footer-val {
+      font-size: 11px;
+      font-family: var(--mono);
+      color: var(--text-dim);
+      font-weight: 500;
+    }
+
+    .footer-val.rx {
+      color: var(--rx);
+    }
+
+    .footer-val.tx {
+      color: var(--tx);
+    }
+
+    .footer-val.ok {
+      color: #22c55e;
+    }
+
+    .footer-val.warn {
+      color: #f59e0b;
+    }
+
+    .footer-refresh {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-family: var(--mono);
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    .footer-refresh i {
+      font-size: 10px;
+      color: var(--accent);
+    }
+
+    .footer-bottom {
+      border-top: 1px solid var(--border-subtle);
+      margin-top: 14px;
+      padding-top: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .footer-brand {
+      font-size: 11px;
+      font-family: var(--mono);
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .footer-brand span {
+      color: var(--accent);
+    }
+
+    .footer-meta {
+      font-size: 10px;
+      font-family: var(--mono);
+      color: var(--muted);
+    }
+
+    /* ── Spinner ────────────────────────────────────────────────────── */
     .loading {
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 12px;
+      gap: 10px;
       color: var(--muted);
       font-family: var(--mono);
       font-size: 12px;
@@ -260,12 +504,12 @@
     }
 
     .spinner {
-      width: 16px;
-      height: 16px;
+      width: 14px;
+      height: 14px;
       border: 2px solid var(--border);
       border-top-color: var(--accent);
       border-radius: 50%;
-      animation: spin .6s linear infinite;
+      animation: spin .7s linear infinite;
     }
 
     @keyframes spin {
@@ -274,9 +518,34 @@
       }
     }
 
-    @media (max-width: 768px) {
+    /* ── Responsive ─────────────────────────────────────────────────── */
+    @media (max-width: 900px) {
+      .footer-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+      }
+
+      .footer-group {
+        border-right: none;
+        padding: 0;
+      }
+    }
+
+    @media (max-width: 600px) {
       main {
         padding: 16px;
+      }
+
+      .footer-grid {
+        grid-template-columns: 1fr;
+      }
+
+      header {
+        padding: 0 16px;
+      }
+
+      footer {
+        padding: 0 16px;
       }
     }
   </style>
@@ -289,37 +558,122 @@
         <i class="fa-solid fa-arrow-left"></i> Voltar
       </button>
       <div class="host-title" id="hostTitle">
-        <i class="fa-solid fa-server"></i> —
+        <i class="fa-solid fa-server"></i> <span style="color:var(--muted)">—</span>
       </div>
+    </div>
+    <div class="header-right">
+      <div class="status-dot" id="statusDot" style="display:none"></div>
+      <div class="status-label" id="statusLabel"></div>
     </div>
   </header>
 
   <main>
-    <div class="section-title"><i class="fa-solid fa-gauge-high"></i> Estatísticas Atuais</div>
+    <div class="section-label"><i class="fa-solid fa-gauge-high"></i> Estatísticas Atuais</div>
     <div class="kpi-grid" id="kpiGrid">
       <div class="loading">
         <div class="spinner"></div> Carregando...
       </div>
     </div>
 
-    <div class="section-title"><i class="fa-solid fa-calendar-day"></i> Últimos 30 dias</div>
+    <div class="section-label"><i class="fa-solid fa-calendar-day"></i> Últimos 30 dias</div>
     <div class="chart-card">
       <div class="chart-header">
-        <i class="fa-solid fa-chart-bar"></i>
-        <div class="chart-title">Tráfego Diário</div>
+        <div class="chart-header-left">
+          <i class="fa-solid fa-chart-bar"></i>
+          <div class="chart-title">Tráfego Diário</div>
+        </div>
+        <div class="chart-badge">30 dias</div>
       </div>
       <canvas id="dailyChart"></canvas>
     </div>
 
-    <div class="section-title"><i class="fa-solid fa-calendar-days"></i> Últimos 12 meses</div>
+    <div class="section-label"><i class="fa-solid fa-calendar-days"></i> Últimos 12 meses</div>
     <div class="chart-card">
       <div class="chart-header">
-        <i class="fa-solid fa-chart-line"></i>
-        <div class="chart-title">Tráfego Mensal</div>
+        <div class="chart-header-left">
+          <i class="fa-solid fa-chart-line"></i>
+          <div class="chart-title">Tráfego Mensal</div>
+        </div>
+        <div class="chart-badge">12 meses</div>
       </div>
       <canvas id="monthlyChart"></canvas>
     </div>
   </main>
+
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-grid">
+
+        <!-- Tráfego do Mês -->
+        <div class="footer-group">
+          <div class="footer-group-label"><i class="fa-solid fa-calendar-days"></i> Este Mês</div>
+          <div class="footer-row">
+            <div class="footer-key">↓ Recebido</div>
+            <div class="footer-val rx" id="fMonthRx">—</div>
+          </div>
+          <div class="footer-row">
+            <div class="footer-key">↑ Enviado</div>
+            <div class="footer-val tx" id="fMonthTx">—</div>
+          </div>
+          <div class="footer-row">
+            <div class="footer-key">Total</div>
+            <div class="footer-val" id="fMonthTotal">—</div>
+          </div>
+        </div>
+
+        <!-- Dia de Hoje -->
+        <div class="footer-group">
+          <div class="footer-group-label"><i class="fa-solid fa-calendar-day"></i> Hoje</div>
+          <div class="footer-row">
+            <div class="footer-key">↓ Recebido</div>
+            <div class="footer-val rx" id="fTodayRx">—</div>
+          </div>
+          <div class="footer-row">
+            <div class="footer-key">↑ Enviado</div>
+            <div class="footer-val tx" id="fTodayTx">—</div>
+          </div>
+          <div class="footer-row">
+            <div class="footer-key">Total</div>
+            <div class="footer-val" id="fTodayTotal">—</div>
+          </div>
+        </div>
+
+        <!-- Informações do Host -->
+        <div class="footer-group">
+          <div class="footer-group-label"><i class="fa-solid fa-server"></i> Host</div>
+          <div class="footer-row">
+            <div class="footer-key">Interface</div>
+            <div class="footer-val" id="fIface">—</div>
+          </div>
+          <div class="footer-row">
+            <div class="footer-key">Monitorado desde</div>
+            <div class="footer-val" id="fSince">—</div>
+          </div>
+          <div class="footer-row">
+            <div class="footer-key">Status</div>
+            <div class="footer-val ok" id="fStatus">—</div>
+          </div>
+        </div>
+
+        <!-- Atualização -->
+        <div class="footer-group">
+          <div class="footer-refresh">
+            <i class="fa-solid fa-rotate"></i>
+            <span id="fLastUpdate">Atualizando...</span>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="footer-bottom">
+        <div class="footer-brand">
+          <i class="fa-solid fa-chart-area"></i>
+          vnstat <span>dashboard</span>
+        </div>
+        <div class="footer-meta" id="fFooterMeta">atualiza a cada 30s</div>
+      </div>
+    </div>
+  </footer>
 
   <script>
     const hostName = new URLSearchParams(window.location.search).get('h') ||
@@ -336,45 +690,100 @@
         const res = await fetch(`/api/host/${hostName}`);
         const data = await res.json();
 
-        document.getElementById('hostTitle').innerHTML = `<i class="fa-solid fa-server"></i> ${data.host.display_name}`;
+        // Header
+        document.getElementById('hostTitle').innerHTML =
+          `<i class="fa-solid fa-server"></i> ${data.host.display_name}`;
 
+        // Status indicator
+        const dot = document.getElementById('statusDot');
+        const lbl = document.getElementById('statusLabel');
+        const online = data.host.online !== false;
+        dot.style.display = 'block';
+        dot.style.background = online ? '#22c55e' : '#ef4444';
+        dot.style.boxShadow = online ? '0 0 6px rgba(34,197,94,0.6)' : '0 0 6px rgba(239,68,68,0.6)';
+        lbl.textContent = online ? 'online' : 'offline';
+
+        // KPI cards
         const c = data.current || {};
         document.getElementById('kpiGrid').innerHTML = `
-          <div class="kpi-card">
+          <div class="kpi-card rx-card">
             <div class="kpi-header">
               <div class="kpi-label">Total Recebido</div>
               <i class="fa-solid fa-cloud-arrow-down kpi-icon"></i>
             </div>
             <div class="kpi-value rx">${c.rx_total_fmt || '—'}</div>
+            <div class="kpi-sub">${c.rx_total ? formatBytes(c.rx_total) : ''}</div>
           </div>
-          <div class="kpi-card">
+          <div class="kpi-card tx-card">
             <div class="kpi-header">
               <div class="kpi-label">Total Enviado</div>
               <i class="fa-solid fa-cloud-arrow-up kpi-icon"></i>
             </div>
             <div class="kpi-value tx">${c.tx_total_fmt || '—'}</div>
+            <div class="kpi-sub">${c.tx_total ? formatBytes(c.tx_total) : ''}</div>
           </div>
         `;
 
+        // Footer
+        const today = data.today || {};
+        const month = data.month || {};
+        const host = data.host || {};
+
+        setText('fTodayRx', today.rx_fmt || '—');
+        setText('fTodayTx', today.tx_fmt || '—');
+        setText('fTodayTotal', today.total_fmt || (today.rx && today.tx ? formatBytes((today.rx || 0) + (today.tx || 0)) : '—'));
+
+        setText('fMonthRx', month.rx_fmt || '—');
+        setText('fMonthTx', month.tx_fmt || '—');
+        setText('fMonthTotal', month.total_fmt || (month.rx && month.tx ? formatBytes((month.rx || 0) + (month.tx || 0)) : '—'));
+
+        setText('fIface', host.interface || data.host.name || '—');
+        setText('fSince', host.created_at ? fmtDate(host.created_at) : '—');
+
+        const statusEl = document.getElementById('fStatus');
+        statusEl.textContent = online ? 'online' : 'offline';
+        statusEl.className = 'footer-val ' + (online ? 'ok' : 'warn');
+
+        const now = new Date();
+        setText('fLastUpdate', `última atualização ${now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}`);
+        setText('fFooterMeta', `${now.toLocaleDateString('pt-BR')} · atualiza a cada 30s`);
+
+        // Charts
         const chartBaseOpts = {
           responsive: true,
           maintainAspectRatio: true,
           plugins: {
-            legend: { labels: { color: '#cbd5e1', font: { family: "IBM Plex Mono, monospace", size: 11 }, padding: 16, usePointStyle: true } },
+            legend: {
+              labels: {
+                color: '#94a3b8',
+                font: { family: 'IBM Plex Mono, monospace', size: 11 },
+                padding: 16,
+                usePointStyle: true,
+                pointStyleWidth: 8,
+              }
+            },
             tooltip: {
-              backgroundColor: '#0f172a',
-              borderColor: '#38bdf8',
+              backgroundColor: '#0d1117',
+              borderColor: '#1e293b',
               borderWidth: 1,
-              titleFont: { family: "IBM Plex Mono, monospace", size: 12 },
-              bodyFont: { family: "IBM Plex Mono, monospace", size: 11 },
-              callbacks: { label: ctx => `${ctx.dataset.label}: ${formatBytes(ctx.parsed.y)}` },
+              padding: 10,
+              titleFont: { family: 'IBM Plex Mono, monospace', size: 12 },
+              bodyFont: { family: 'IBM Plex Mono, monospace', size: 11 },
+              callbacks: { label: ctx => `  ${ctx.dataset.label}: ${formatBytes(ctx.parsed.y)}` },
             },
           },
           scales: {
-            x: { grid: { color: '#1e293b' }, ticks: { color: '#64748b', font: { family: "IBM Plex Mono, monospace", size: 10 } } },
+            x: {
+              grid: { color: 'rgba(30,41,59,0.5)' },
+              ticks: { color: '#475569', font: { family: 'IBM Plex Mono, monospace', size: 10 } }
+            },
             y: {
-              grid: { color: '#1e293b' },
-              ticks: { color: '#64748b', font: { family: "IBM Plex Mono, monospace", size: 10 }, callback: v => formatBytes(v) },
+              grid: { color: 'rgba(30,41,59,0.5)' },
+              ticks: {
+                color: '#475569',
+                font: { family: 'IBM Plex Mono, monospace', size: 10 },
+                callback: v => formatBytes(v)
+              },
             },
           },
         };
@@ -390,25 +799,22 @@
               {
                 label: 'Download (↓)',
                 data: data.days.map(d => d.rx),
-                backgroundColor: '#38bdf8cc',
+                backgroundColor: 'rgba(56,189,248,0.15)',
                 borderColor: '#38bdf8',
-                borderWidth: 1,
+                borderWidth: 1.5,
                 borderRadius: 3,
               },
               {
                 label: 'Upload (↑)',
                 data: data.days.map(d => d.tx),
-                backgroundColor: '#f472b6cc',
+                backgroundColor: 'rgba(244,114,182,0.15)',
                 borderColor: '#f472b6',
-                borderWidth: 1,
+                borderWidth: 1.5,
                 borderRadius: 3,
               },
             ],
           },
-          options: {
-            ...chartBaseOpts,
-            interaction: { mode: 'index', intersect: false },
-          },
+          options: { ...chartBaseOpts, interaction: { mode: 'index', intersect: false } },
         });
 
         // Monthly Chart
@@ -423,34 +829,45 @@
                 label: 'Download (↓)',
                 data: data.months.map(m => m.rx),
                 borderColor: '#38bdf8',
-                backgroundColor: '#38bdf81a',
+                backgroundColor: 'rgba(56,189,248,0.06)',
                 borderWidth: 2,
                 fill: true,
-                tension: 0.4,
-                pointRadius: 4,
-                pointHoverRadius: 6,
+                tension: 0.35,
+                pointRadius: 3,
+                pointHoverRadius: 5,
+                pointBackgroundColor: '#38bdf8',
               },
               {
                 label: 'Upload (↑)',
                 data: data.months.map(m => m.tx),
                 borderColor: '#f472b6',
-                backgroundColor: '#f472b61a',
+                backgroundColor: 'rgba(244,114,182,0.06)',
                 borderWidth: 2,
                 fill: true,
-                tension: 0.4,
-                pointRadius: 4,
-                pointHoverRadius: 6,
+                tension: 0.35,
+                pointRadius: 3,
+                pointHoverRadius: 5,
+                pointBackgroundColor: '#f472b6',
               },
             ],
           },
-          options: {
-            ...chartBaseOpts,
-            interaction: { mode: 'index', intersect: false },
-          },
+          options: { ...chartBaseOpts, interaction: { mode: 'index', intersect: false } },
         });
+
       } catch (err) {
         console.error('Load error:', err);
       }
+    }
+
+    function setText(id, val) {
+      const el = document.getElementById(id);
+      if (el) el.textContent = val;
+    }
+
+    function fmtDate(iso) {
+      try {
+        return new Date(iso).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' });
+      } catch { return iso; }
     }
 
     function formatBytes(bytes) {
