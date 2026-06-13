@@ -4,11 +4,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>vnstat — Host Details</title>
+  <title>vnstat — Dashboard</title>
   <link rel="icon" type="image/x-icon" href="/favicon.ico?v=1">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link
-    href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600;700&display=swap"
+    href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap"
     rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
@@ -25,13 +25,9 @@
       --bg: #0a0e14;
       --surface: #0f1520;
       --surface2: #151d2b;
-      --surface3: #1a2332;
       --border: #1e293b;
-      --border-light: #2d3e52;
       --accent: #38bdf8;
-      --accent2: #34d399;
       --accent3: #818cf8;
-      --accent-warm: #f97316;
       --text: #e2e8f0;
       --text-dim: #cbd5e1;
       --muted: #64748b;
@@ -63,7 +59,7 @@
         linear-gradient(var(--border) 1px, transparent 1px),
         linear-gradient(90deg, var(--border) 1px, transparent 1px);
       background-size: 40px 40px;
-      opacity: 0.2;
+      opacity: 0.3;
       pointer-events: none;
       z-index: 0;
     }
@@ -80,13 +76,12 @@
     header {
       position: relative;
       z-index: 10;
-      background: linear-gradient(180deg, var(--surface) 0%, rgba(15, 21, 32, 0.8) 100%);
+      background: var(--surface);
       border-bottom: 1px solid var(--border);
       padding: 16px 24px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
     }
 
     .header-left {
@@ -112,109 +107,84 @@
     }
 
     .btn-back:hover {
-      border-color: var(--accent-warm);
-      color: var(--accent-warm);
-      background: rgba(249, 115, 22, 0.1);
-      box-shadow: 0 0 15px rgba(249, 115, 22, 0.15);
+      border-color: var(--accent);
+      color: var(--accent);
+      box-shadow: 0 0 15px rgba(56, 189, 248, 0.1);
     }
 
     .host-title {
-      font-size: 18px;
-      font-weight: 700;
+      font-size: 16px;
+      font-weight: 600;
       font-family: var(--mono);
       display: flex;
       align-items: center;
-      gap: 10px;
-      letter-spacing: -0.5px;
+      gap: 8px;
     }
 
     .host-title i {
       color: var(--accent);
-      font-size: 16px;
+      font-size: 14px;
     }
 
     main {
       position: relative;
       z-index: 1;
       flex: 1;
-      padding: 32px 24px 120px;
+      padding: 24px;
       max-width: 1480px;
       margin: 0 auto;
       width: 100%;
-      overflow-y: auto;
+
     }
 
     .section-title {
-      font-size: 13px;
-      font-weight: 700;
+      font-size: 14px;
+      font-weight: 600;
       text-transform: uppercase;
-      letter-spacing: 0.12em;
+      letter-spacing: 0.1em;
       color: var(--muted);
-      margin: 32px 0 18px 0;
+      margin: 32px 0 16px 0;
       font-family: var(--mono);
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 8px;
     }
 
     .section-title:first-child {
       margin-top: 0;
     }
 
-    .section-title i {
-      color: var(--accent);
-      font-size: 14px;
-    }
-
     /* ── KPI Grid ───────────────────────────────────────────────────── */
     .kpi-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 16px;
-      margin-bottom: 32px;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+      margin-bottom: 24px;
     }
 
     .kpi-card {
-      background: linear-gradient(135deg, var(--surface2) 0%, var(--surface3) 100%);
+      background: var(--surface2);
       border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 20px;
-      transition: all .3s cubic-bezier(0.4, 0, 0.2, 1);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .kpi-card::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(135deg, rgba(56, 189, 248, 0.1) 0%, transparent 100%);
-      opacity: 0;
-      transition: opacity .3s;
+      border-radius: 12px;
+      padding: 16px;
+      transition: all .2s;
     }
 
     .kpi-card:hover {
       border-color: var(--accent);
-      box-shadow: 0 8px 32px rgba(56, 189, 248, 0.2);
-      transform: translateY(-2px);
-    }
-
-    .kpi-card:hover::before {
-      opacity: 1;
+      box-shadow: 0 0 20px rgba(56, 189, 248, 0.15);
     }
 
     .kpi-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 12px;
-      position: relative;
-      z-index: 1;
+      margin-bottom: 8px;
     }
 
     .kpi-label {
       font-size: 11px;
-      font-weight: 600;
+      font-weight: 500;
       text-transform: uppercase;
       letter-spacing: 0.08em;
       color: var(--muted);
@@ -222,70 +192,54 @@
     }
 
     .kpi-icon {
-      font-size: 16px;
-      color: var(--accent);
-      transition: all .3s;
+      font-size: 13px;
+      color: var(--muted);
     }
 
     .kpi-card:hover .kpi-icon {
-      transform: scale(1.2) rotate(5deg);
+      color: var(--accent);
     }
 
     .kpi-value {
-      font-size: 28px;
-      font-weight: 700;
+      font-size: 20px;
+      font-weight: 600;
       font-family: var(--mono);
       letter-spacing: -0.5px;
-      position: relative;
-      z-index: 1;
     }
 
     .kpi-value.rx {
-      background: linear-gradient(135deg, var(--rx), var(--accent2));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+      color: var(--rx);
     }
 
     .kpi-value.tx {
-      background: linear-gradient(135deg, var(--tx), var(--accent-warm));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+      color: var(--tx);
     }
 
     /* ── Charts ────────────────────────────────────────────────────── */
     .chart-card {
-      background: linear-gradient(135deg, var(--surface2) 0%, var(--surface3) 100%);
+      background: var(--surface2);
       border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 24px;
-      margin-bottom: 32px;
-      transition: all .3s;
-    }
-
-    .chart-card:hover {
-      border-color: var(--accent);
-      box-shadow: 0 8px 32px rgba(56, 189, 248, 0.15);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 24px;
     }
 
     .chart-header {
       display: flex;
       align-items: center;
-      gap: 10px;
-      margin-bottom: 18px;
+      gap: 8px;
+      margin-bottom: 16px;
     }
 
     .chart-title {
       font-size: 14px;
-      font-weight: 700;
+      font-weight: 600;
       font-family: var(--mono);
-      color: var(--text);
     }
 
     .chart-header i {
-      color: var(--accent);
-      font-size: 14px;
+      color: var(--muted);
+      font-size: 13px;
     }
 
     canvas {
@@ -320,150 +274,9 @@
       }
     }
 
-    /* ── Footer ────────────────────────────────────────────────────── */
-    footer {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      z-index: 20;
-      background: linear-gradient(180deg, rgba(15, 21, 32, 0) 0%, var(--surface) 50%, var(--surface) 100%);
-      border-top: 1px solid var(--border);
-      padding: 16px 24px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 16px;
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-    }
-
-    .footer-content {
-      display: flex;
-      align-items: center;
-      gap: 24px;
-      width: 100%;
-      justify-content: flex-end;
-    }
-
-    .api-status {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-size: 12px;
-      font-family: var(--mono);
-      padding: 8px 14px;
-      background: rgba(56, 189, 248, 0.1);
-      border: 1px solid rgba(56, 189, 248, 0.3);
-      border-radius: 8px;
-      transition: all .3s;
-    }
-
-    .api-status:hover {
-      background: rgba(56, 189, 248, 0.15);
-      border-color: var(--accent);
-      box-shadow: 0 0 12px rgba(56, 189, 248, 0.2);
-    }
-
-    .api-status-dot {
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      background: #34d399;
-      animation: pulse-status 2s ease-in-out infinite;
-      box-shadow: 0 0 6px #34d399;
-    }
-
-    .api-status-dot.error {
-      background: #ef4444;
-      animation: pulse-status-error 1s ease-in-out infinite;
-      box-shadow: 0 0 6px #ef4444;
-    }
-
-    @keyframes pulse-status {
-
-      0%,
-      100% {
-        opacity: 1;
-        box-shadow: 0 0 6px #34d399;
-      }
-
-      50% {
-        opacity: 0.6;
-        box-shadow: 0 0 3px #34d399;
-      }
-    }
-
-    @keyframes pulse-status-error {
-
-      0%,
-      100% {
-        opacity: 1;
-        box-shadow: 0 0 6px #ef4444;
-      }
-
-      50% {
-        opacity: 0.5;
-        box-shadow: 0 0 3px #ef4444;
-      }
-    }
-
-    .api-status-text {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-    }
-
-    .api-status-label {
-      color: var(--muted);
-      font-size: 10px;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-    }
-
-    .api-status-value {
-      color: var(--text);
-      font-weight: 600;
-      font-size: 12px;
-    }
-
-    .api-status-value.error {
-      color: #ef4444;
-    }
-
-    /* ── Responsive ─────────────────────────────────────────────────── */
     @media (max-width: 768px) {
       main {
-        padding: 24px 16px 140px;
-      }
-
-      .kpi-grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
-
-      footer {
-        padding: 12px 16px;
-      }
-
-      .footer-content {
-        gap: 12px;
-      }
-
-      .api-status {
-        padding: 6px 10px;
-        font-size: 11px;
-      }
-
-      .api-status-text {
-        gap: 1px;
-      }
-
-      .api-status-label {
-        font-size: 9px;
-      }
-
-      .api-status-value {
-        font-size: 11px;
+        padding: 16px;
       }
     }
   </style>
@@ -508,61 +321,15 @@
     </div>
   </main>
 
-  <footer>
-    <div class="footer-content">
-      <div class="api-status" id="apiStatus">
-        <div class="api-status-dot"></div>
-        <div class="api-status-text">
-          <div class="api-status-label">API Status</div>
-          <div class="api-status-value">—</div>
-        </div>
-      </div>
-    </div>
-  </footer>
-
   <script>
     const hostName = new URLSearchParams(window.location.search).get('h') ||
       window.location.pathname.split('/').pop();
     let chartsInstances = {};
-    let apiLatency = 0;
 
     document.addEventListener('DOMContentLoaded', () => {
       loadHostDetail();
-      checkApiStatus();
       setInterval(loadHostDetail, 30000);
-      setInterval(checkApiStatus, 5000);
     });
-
-    async function checkApiStatus() {
-      try {
-        const startTime = performance.now();
-        const res = await fetch('/api/health', { method: 'HEAD' });
-        const endTime = performance.now();
-        apiLatency = Math.round(endTime - startTime);
-
-        const statusEl = document.getElementById('apiStatus');
-        const dot = statusEl.querySelector('.api-status-dot');
-        const value = statusEl.querySelector('.api-status-value');
-
-        if (res.ok) {
-          dot.classList.remove('error');
-          value.classList.remove('error');
-          value.textContent = `${apiLatency}ms`;
-        } else {
-          dot.classList.add('error');
-          value.classList.add('error');
-          value.textContent = 'Erro';
-        }
-      } catch (err) {
-        const statusEl = document.getElementById('apiStatus');
-        const dot = statusEl.querySelector('.api-status-dot');
-        const value = statusEl.querySelector('.api-status-value');
-        dot.classList.add('error');
-        value.classList.add('error');
-        value.textContent = 'Desconectado';
-        console.error('API status check failed:', err);
-      }
-    }
 
     async function loadHostDetail() {
       try {

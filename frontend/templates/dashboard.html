@@ -8,7 +8,7 @@
   <link rel="icon" type="image/x-icon" href="/favicon.ico?v=1">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link
-    href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600;700&display=swap"
+    href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap"
     rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
@@ -25,13 +25,10 @@
       --bg: #0a0e14;
       --surface: #0f1520;
       --surface2: #151d2b;
-      --surface3: #1a2332;
       --border: #1e293b;
-      --border-light: #2d3e52;
       --accent: #38bdf8;
       --accent2: #34d399;
       --accent3: #818cf8;
-      --accent-warm: #f97316;
       --text: #e2e8f0;
       --text-dim: #cbd5e1;
       --muted: #64748b;
@@ -63,7 +60,7 @@
         linear-gradient(var(--border) 1px, transparent 1px),
         linear-gradient(90deg, var(--border) 1px, transparent 1px);
       background-size: 40px 40px;
-      opacity: 0.2;
+      opacity: 0.3;
       pointer-events: none;
       z-index: 0;
     }
@@ -80,14 +77,13 @@
     header {
       position: relative;
       z-index: 10;
-      background: linear-gradient(180deg, var(--surface) 0%, rgba(15, 21, 32, 0.8) 100%);
+      background: var(--surface);
       border-bottom: 1px solid var(--border);
       padding: 16px 24px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       gap: 16px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
     }
 
     .header-logo {
@@ -96,29 +92,26 @@
       gap: 12px;
       font-family: var(--mono);
       font-size: 16px;
-      font-weight: 600;
-      letter-spacing: -0.5px;
+      font-weight: 500;
     }
 
     .header-logo-icon {
-      width: 36px;
-      height: 36px;
+      width: 32px;
+      height: 32px;
       background: linear-gradient(135deg, var(--accent), var(--accent3));
-      border-radius: 10px;
+      border-radius: 8px;
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 4px 12px rgba(56, 189, 248, 0.25);
     }
 
     .header-logo-icon svg {
-      width: 20px;
-      height: 20px;
+      width: 18px;
+      height: 18px;
     }
 
     .header-logo span {
       color: var(--accent);
-      font-weight: 700;
     }
 
     .header-right {
@@ -134,10 +127,6 @@
       display: flex;
       align-items: center;
       gap: 6px;
-      padding: 6px 12px;
-      background: rgba(100, 116, 139, 0.1);
-      border-radius: 6px;
-      border: 1px solid var(--border);
     }
 
     .btn-logout {
@@ -157,16 +146,15 @@
     }
 
     .btn-logout:hover {
-      border-color: var(--accent-warm);
-      color: var(--accent-warm);
-      background: rgba(249, 115, 22, 0.1);
+      border-color: var(--muted);
+      color: var(--text-dim);
     }
 
     main {
       position: relative;
       z-index: 1;
       flex: 1;
-      padding: 32px 24px 120px;
+      padding: 24px;
       max-width: 1400px;
       margin: 0 auto;
       width: 100%;
@@ -174,72 +162,50 @@
     }
 
     .section-title {
-      font-size: 13px;
-      font-weight: 700;
+      font-size: 14px;
+      font-weight: 600;
       text-transform: uppercase;
-      letter-spacing: 0.12em;
+      letter-spacing: 0.1em;
       color: var(--muted);
-      margin-bottom: 18px;
+      margin-bottom: 16px;
       font-family: var(--mono);
       display: flex;
       align-items: center;
-      gap: 10px;
-    }
-
-    .section-title i {
-      color: var(--accent);
-      font-size: 14px;
+      gap: 8px;
     }
 
     /* ── KPI Cards ──────────────────────────────────────────────────── */
     .kpi-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 16px;
-      margin-bottom: 40px;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 12px;
+      margin-bottom: 32px;
     }
 
     .kpi-card {
-      background: linear-gradient(135deg, var(--surface2) 0%, var(--surface3) 100%);
+      background: var(--surface2);
       border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 20px;
-      transition: all .3s cubic-bezier(0.4, 0, 0.2, 1);
+      border-radius: 12px;
+      padding: 16px;
+      transition: all .2s;
       position: relative;
-      overflow: hidden;
-    }
-
-    .kpi-card::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(135deg, rgba(56, 189, 248, 0.1) 0%, transparent 100%);
-      opacity: 0;
-      transition: opacity .3s;
     }
 
     .kpi-card:hover {
       border-color: var(--accent);
-      box-shadow: 0 8px 32px rgba(56, 189, 248, 0.2);
-      transform: translateY(-2px);
-    }
-
-    .kpi-card:hover::before {
-      opacity: 1;
+      box-shadow: 0 0 20px rgba(56, 189, 248, 0.15);
     }
 
     .kpi-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 12px;
-      position: relative;
-      z-index: 1;
+      margin-bottom: 8px;
     }
 
     .kpi-label {
       font-size: 11px;
-      font-weight: 600;
+      font-weight: 500;
       text-transform: uppercase;
       letter-spacing: 0.08em;
       color: var(--muted);
@@ -247,35 +213,26 @@
     }
 
     .kpi-icon {
-      font-size: 16px;
-      color: var(--accent);
-      transition: all .3s;
+      font-size: 14px;
+      color: var(--muted);
     }
 
     .kpi-card:hover .kpi-icon {
-      transform: scale(1.2) rotate(5deg);
+      color: var(--accent);
     }
 
     .kpi-value {
-      font-size: 28px;
-      font-weight: 700;
+      font-size: 24px;
+      font-weight: 600;
       font-family: var(--mono);
-      margin-bottom: 6px;
+      margin-bottom: 4px;
       letter-spacing: -0.5px;
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      position: relative;
-      z-index: 1;
     }
 
     .kpi-subtext {
       font-size: 12px;
       color: var(--text-dim);
       font-family: var(--mono);
-      position: relative;
-      z-index: 1;
     }
 
     .kpi-live {
@@ -297,79 +254,58 @@
     /* ── Host Cards ─────────────────────────────────────────────────── */
     .hosts-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      gap: 18px;
-      margin-bottom: 40px;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+      margin-bottom: 32px;
     }
 
     .host-card {
-      background: linear-gradient(135deg, var(--surface2) 0%, var(--surface3) 100%);
+      background: var(--surface2);
       border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 22px;
+      border-radius: 12px;
+      padding: 20px;
       cursor: pointer;
-      transition: all .3s cubic-bezier(0.4, 0, 0.2, 1);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .host-card::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(135deg, rgba(56, 189, 248, 0.05) 0%, transparent 100%);
-      opacity: 0;
-      transition: opacity .3s;
+      transition: all .2s;
     }
 
     .host-card:hover {
       border-color: var(--accent);
-      box-shadow: 0 12px 40px rgba(56, 189, 248, 0.25);
-      transform: translateY(-4px);
-    }
-
-    .host-card:hover::before {
-      opacity: 1;
+      box-shadow: 0 0 30px rgba(56, 189, 248, 0.2);
     }
 
     .host-card-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 18px;
-      position: relative;
-      z-index: 1;
+      margin-bottom: 16px;
     }
 
     .host-title-wrapper {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 8px;
     }
 
     .host-icon {
-      font-size: 16px;
-      color: var(--accent);
-      transition: all .3s;
+      font-size: 14px;
+      color: var(--muted);
     }
 
     .host-card:hover .host-icon {
-      transform: scale(1.15);
+      color: var(--accent);
     }
 
     .host-name {
       font-size: 15px;
-      font-weight: 700;
+      font-weight: 600;
       font-family: var(--mono);
-      color: var(--text);
     }
 
     .host-status {
-      width: 14px;
-      height: 14px;
+      width: 12px;
+      height: 12px;
       border-radius: 50%;
       animation: pulse-dot 2s ease-in-out infinite;
-      box-shadow: 0 0 8px currentColor;
     }
 
     .host-status.online {
@@ -385,19 +321,16 @@
       0%,
       100% {
         opacity: 1;
-        box-shadow: 0 0 8px currentColor;
+        box-shadow: 0 0 0 0 currentColor;
       }
 
       50% {
-        opacity: .6;
-        box-shadow: 0 0 4px currentColor;
+        opacity: .7;
       }
     }
 
     .host-stat {
-      margin-bottom: 14px;
-      position: relative;
-      z-index: 1;
+      margin-bottom: 12px;
     }
 
     .host-stat-label {
@@ -406,14 +339,13 @@
       font-family: var(--mono);
       text-transform: uppercase;
       letter-spacing: 0.05em;
-      font-weight: 600;
     }
 
     .host-stat-value {
-      font-size: 15px;
-      font-weight: 700;
+      font-size: 14px;
+      font-weight: 600;
       font-family: var(--mono);
-      margin-top: 4px;
+      margin-top: 3px;
     }
 
     .host-stat-value.rx {
@@ -428,29 +360,21 @@
     .charts-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
-      gap: 18px;
-      margin-bottom: 40px;
+      gap: 16px;
     }
 
     .chart-card {
-      background: linear-gradient(135deg, var(--surface2) 0%, var(--surface3) 100%);
+      background: var(--surface2);
       border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 24px;
-      transition: all .3s;
-    }
-
-    .chart-card:hover {
-      border-color: var(--accent);
-      box-shadow: 0 8px 32px rgba(56, 189, 248, 0.15);
+      border-radius: 12px;
+      padding: 20px;
     }
 
     .chart-title {
       font-size: 14px;
-      font-weight: 700;
-      margin-bottom: 18px;
+      font-weight: 600;
+      margin-bottom: 16px;
       font-family: var(--mono);
-      color: var(--text);
     }
 
     canvas {
@@ -483,121 +407,10 @@
       }
     }
 
-    /* ── Footer ────────────────────────────────────────────────────── */
-    footer {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      z-index: 20;
-      background: linear-gradient(180deg, rgba(15, 21, 32, 0) 0%, var(--surface) 50%, var(--surface) 100%);
-      border-top: 1px solid var(--border);
-      padding: 16px 24px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 16px;
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-    }
-
-    .footer-content {
-      display: flex;
-      align-items: center;
-      gap: 24px;
-      width: 100%;
-      justify-content: flex-end;
-    }
-
-    .api-status {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-size: 12px;
-      font-family: var(--mono);
-      padding: 8px 14px;
-      background: rgba(56, 189, 248, 0.1);
-      border: 1px solid rgba(56, 189, 248, 0.3);
-      border-radius: 8px;
-      transition: all .3s;
-    }
-
-    .api-status:hover {
-      background: rgba(56, 189, 248, 0.15);
-      border-color: var(--accent);
-      box-shadow: 0 0 12px rgba(56, 189, 248, 0.2);
-    }
-
-    .api-status-dot {
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      background: #34d399;
-      animation: pulse-status 2s ease-in-out infinite;
-      box-shadow: 0 0 6px #34d399;
-    }
-
-    .api-status-dot.error {
-      background: #ef4444;
-      animation: pulse-status-error 1s ease-in-out infinite;
-      box-shadow: 0 0 6px #ef4444;
-    }
-
-    @keyframes pulse-status {
-
-      0%,
-      100% {
-        opacity: 1;
-        box-shadow: 0 0 6px #34d399;
-      }
-
-      50% {
-        opacity: 0.6;
-        box-shadow: 0 0 3px #34d399;
-      }
-    }
-
-    @keyframes pulse-status-error {
-
-      0%,
-      100% {
-        opacity: 1;
-        box-shadow: 0 0 6px #ef4444;
-      }
-
-      50% {
-        opacity: 0.5;
-        box-shadow: 0 0 3px #ef4444;
-      }
-    }
-
-    .api-status-text {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-    }
-
-    .api-status-label {
-      color: var(--muted);
-      font-size: 10px;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-    }
-
-    .api-status-value {
-      color: var(--text);
-      font-weight: 600;
-      font-size: 12px;
-    }
-
-    .api-status-value.error {
-      color: #ef4444;
-    }
-
     /* ── Responsive ─────────────────────────────────────────────────── */
     @media (max-width: 768px) {
       main {
-        padding: 24px 16px 140px;
+        padding: 16px;
       }
 
       .charts-grid {
@@ -610,31 +423,6 @@
 
       .hosts-grid {
         grid-template-columns: 1fr;
-      }
-
-      footer {
-        padding: 12px 16px;
-      }
-
-      .footer-content {
-        gap: 12px;
-      }
-
-      .api-status {
-        padding: 6px 10px;
-        font-size: 11px;
-      }
-
-      .api-status-text {
-        gap: 1px;
-      }
-
-      .api-status-label {
-        font-size: 9px;
-      }
-
-      .api-status-value {
-        font-size: 11px;
       }
     }
   </style>
@@ -684,65 +472,18 @@
     </div>
   </main>
 
-  <footer>
-    <div class="footer-content">
-      <div class="api-status" id="apiStatus">
-        <div class="api-status-dot"></div>
-        <div class="api-status-text">
-          <div class="api-status-label">API Status</div>
-          <div class="api-status-value">—</div>
-        </div>
-      </div>
-    </div>
-  </footer>
-
   <script>
     let dailyChartInstance = null;
     let monthlyChartInstance = null;
-    let apiLatency = 0;
 
     // ── Init ────────────────────────────────────────────────────────────
     document.addEventListener('DOMContentLoaded', () => {
       loadUser();
       loadOverview();
       loadCharts();
-      checkApiStatus();
       // Refresh every 30 seconds
       setInterval(loadOverview, 30000);
-      // Check API status every 5 seconds
-      setInterval(checkApiStatus, 5000);
     });
-
-    async function checkApiStatus() {
-      try {
-        const startTime = performance.now();
-        const res = await fetch('/api/health', { method: 'HEAD' });
-        const endTime = performance.now();
-        apiLatency = Math.round(endTime - startTime);
-
-        const statusEl = document.getElementById('apiStatus');
-        const dot = statusEl.querySelector('.api-status-dot');
-        const value = statusEl.querySelector('.api-status-value');
-
-        if (res.ok) {
-          dot.classList.remove('error');
-          value.classList.remove('error');
-          value.textContent = `${apiLatency}ms`;
-        } else {
-          dot.classList.add('error');
-          value.classList.add('error');
-          value.textContent = 'Erro';
-        }
-      } catch (err) {
-        const statusEl = document.getElementById('apiStatus');
-        const dot = statusEl.querySelector('.api-status-dot');
-        const value = statusEl.querySelector('.api-status-value');
-        dot.classList.add('error');
-        value.classList.add('error');
-        value.textContent = 'Desconectado';
-        console.error('API status check failed:', err);
-      }
-    }
 
     async function loadUser() {
       try {
@@ -757,7 +498,8 @@
 
     async function loadOverview() {
       try {
-        const data = await fetch('/api/overview').then(r => r.json());
+        const res = await fetch('/api/overview');
+        const data = await res.json();
 
         const kpiGrid = document.getElementById('kpiGrid');
         kpiGrid.innerHTML = `
