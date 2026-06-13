@@ -809,6 +809,33 @@
       const i = Math.floor(Math.log(bytes) / Math.log(k));
       return (bytes / Math.pow(k, i)).toFixed(1) + ' ' + sizes[i];
     }
+
+    function formatBytes(bytes) {
+      if (!bytes) return '0 B';
+      const k = 1024;
+      const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
+      const i = Math.floor(Math.log(bytes) / Math.log(k));
+      return (bytes / Math.pow(k, i)).toFixed(1) + ' ' + sizes[i];
+    }
+
+    // ── ADICIONE ESTA FUNÇÃO AQUI ────────────────────────────────────────
+    function switchTab(tabId, btnElement) {
+      // Remove a classe 'active' de todos os botões de aba
+      document.querySelectorAll('.tab-nav .tab-btn').forEach(btn => {
+        btn.classList.remove('active');
+      });
+
+      // Remove a classe 'active' de todos os painéis de conteúdo
+      document.querySelectorAll('.tab-panel').forEach(panel => {
+        panel.classList.remove('active');
+      });
+
+      // Adiciona a classe 'active' apenas no botão que foi clicado
+      btnElement.classList.add('active');
+
+      // Mostra o painel correspondente (ex: tab-overview ou tab-analysis)
+      document.getElementById(`tab-${tabId}`).classList.add('active');
+    }
   </script>
 </body>
 
