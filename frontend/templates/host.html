@@ -274,9 +274,255 @@
       }
     }
 
+    /* ── Tabs ───────────────────────────────────────────────────────── */
+    .tab-nav {
+      display: flex;
+      gap: 4px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 28px;
+    }
+
+    .tab-btn {
+      padding: 10px 18px;
+      background: transparent;
+      border: none;
+      border-bottom: 2px solid transparent;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 500;
+      font-family: var(--mono);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      cursor: pointer;
+      transition: all .2s;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      margin-bottom: -1px;
+    }
+
+    .tab-btn:hover {
+      color: var(--text);
+    }
+
+    .tab-btn.active {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+    }
+
+    .tab-panel {
+      display: none;
+    }
+
+    .tab-panel.active {
+      display: block;
+    }
+
+    /* ── Analysis tab ───────────────────────────────────────────────── */
+    .analysis-kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px;
+      margin-bottom: 28px;
+    }
+
+    .analysis-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .analysis-row.wide {
+      grid-template-columns: 1fr;
+    }
+
+    .chart-card {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+    }
+
+    .chart-card .chart-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .chart-header-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .chart-badge {
+      font-size: 10px;
+      font-family: var(--mono);
+      padding: 2px 7px;
+      border-radius: 4px;
+      background: var(--border);
+      color: var(--muted);
+    }
+
+    /* ── Heatmap ────────────────────────────────────────────────────── */
+    .heatmap-wrap {
+      overflow-x: auto;
+      padding-bottom: 4px;
+    }
+
+    .heatmap-grid {
+      display: grid;
+      grid-template-rows: repeat(7, 18px);
+      grid-auto-flow: column;
+      gap: 3px;
+    }
+
+    .hm-cell {
+      width: 18px;
+      height: 18px;
+      border-radius: 3px;
+      background: var(--border);
+      transition: transform .1s;
+      cursor: default;
+      position: relative;
+    }
+
+    .hm-cell:hover {
+      transform: scale(1.3);
+      z-index: 10;
+    }
+
+    .hm-cell[data-tip]:hover::after {
+      content: attr(data-tip);
+      position: absolute;
+      bottom: calc(100% + 6px);
+      left: 50%;
+      transform: translateX(-50%);
+      white-space: nowrap;
+      background: #0f172a;
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: 10px;
+      padding: 4px 8px;
+      border-radius: 4px;
+      pointer-events: none;
+      z-index: 100;
+    }
+
+    .heatmap-legend {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 12px;
+      font-size: 10px;
+      color: var(--muted);
+      font-family: var(--mono);
+    }
+
+    .heatmap-legend-cells {
+      display: flex;
+      gap: 3px;
+    }
+
+    .hm-legend-cell {
+      width: 12px;
+      height: 12px;
+      border-radius: 2px;
+    }
+
+    .heatmap-dow {
+      display: grid;
+      grid-template-rows: repeat(7, 18px);
+      gap: 3px;
+      margin-right: 6px;
+      flex-shrink: 0;
+    }
+
+    .heatmap-dow span {
+      font-size: 9px;
+      font-family: var(--mono);
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      line-height: 1;
+    }
+
+    .heatmap-outer {
+      display: flex;
+      align-items: flex-start;
+    }
+
+    /* ── Top Days Table ─────────────────────────────────────────────── */
+    .top-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: var(--mono);
+      font-size: 12px;
+    }
+
+    .top-table th {
+      text-align: left;
+      padding: 6px 10px;
+      color: var(--muted);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .top-table td {
+      padding: 8px 10px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-dim);
+      vertical-align: middle;
+    }
+
+    .top-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .top-table tr:hover td {
+      background: rgba(56, 189, 248, .04);
+    }
+
+    .top-rank {
+      color: var(--muted);
+      font-size: 11px;
+      width: 24px;
+    }
+
+    .bar-bg {
+      background: var(--border);
+      border-radius: 3px;
+      height: 5px;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    .bar-fill {
+      height: 100%;
+      border-radius: 3px;
+      background: linear-gradient(90deg, var(--accent), var(--accent3));
+    }
+
+    .top-total {
+      color: var(--text);
+      font-weight: 500;
+      text-align: right;
+      white-space: nowrap;
+    }
+
     @media (max-width: 768px) {
       main {
         padding: 16px;
+      }
+
+      .analysis-row {
+        grid-template-columns: 1fr;
       }
     }
   </style>
@@ -295,30 +541,133 @@
   </header>
 
   <main>
-    <div class="section-title"><i class="fa-solid fa-gauge-high"></i> Estatísticas Atuais</div>
-    <div class="kpi-grid" id="kpiGrid">
-      <div class="loading">
-        <div class="spinner"></div> Carregando...
-      </div>
-    </div>
+    <!-- ── Tab Navigation ──────────────────────────────────────────── -->
+    <nav class="tab-nav">
+      <button class="tab-btn active" onclick="switchTab('overview', this)">
+        <i class="fa-solid fa-gauge-high"></i> Visão Geral
+      </button>
+      <button class="tab-btn" onclick="switchTab('analysis', this)">
+        <i class="fa-solid fa-magnifying-glass-chart"></i> Análise
+      </button>
+    </nav>
 
-    <div class="section-title"><i class="fa-solid fa-calendar-day"></i> Últimos 30 dias</div>
-    <div class="chart-card">
-      <div class="chart-header">
-        <i class="fa-solid fa-chart-bar"></i>
-        <div class="chart-title">Tráfego Diário</div>
-      </div>
-      <canvas id="dailyChart"></canvas>
-    </div>
+    <!-- ══════════════════════════════════════════════════════════════ -->
+    <!-- TAB: Visão Geral                                              -->
+    <!-- ══════════════════════════════════════════════════════════════ -->
+    <div class="tab-panel active" id="tab-overview">
 
-    <div class="section-title"><i class="fa-solid fa-calendar-days"></i> Últimos 12 meses</div>
-    <div class="chart-card">
-      <div class="chart-header">
-        <i class="fa-solid fa-chart-line"></i>
-        <div class="chart-title">Tráfego Mensal</div>
+      <div class="section-title"><i class="fa-solid fa-gauge-high"></i> Estatísticas Atuais</div>
+      <div class="kpi-grid" id="kpiGrid">
+        <div class="loading">
+          <div class="spinner"></div> Carregando...
+        </div>
       </div>
-      <canvas id="monthlyChart"></canvas>
-    </div>
+
+      <div class="section-title"><i class="fa-solid fa-calendar-day"></i> Últimos 30 dias</div>
+      <div class="chart-card" style="margin-bottom:24px;">
+        <div class="chart-header">
+          <i class="fa-solid fa-chart-bar"></i>
+          <div class="chart-title">Tráfego Diário</div>
+        </div>
+        <canvas id="dailyChart"></canvas>
+      </div>
+
+      <div class="section-title"><i class="fa-solid fa-calendar-days"></i> Últimos 12 meses</div>
+      <div class="chart-card">
+        <div class="chart-header">
+          <i class="fa-solid fa-chart-line"></i>
+          <div class="chart-title">Tráfego Mensal</div>
+        </div>
+        <canvas id="monthlyChart"></canvas>
+      </div>
+
+    </div><!-- /tab-overview -->
+
+    <!-- ══════════════════════════════════════════════════════════════ -->
+    <!-- TAB: Análise                                                  -->
+    <!-- ══════════════════════════════════════════════════════════════ -->
+    <div class="tab-panel" id="tab-analysis">
+
+      <!-- KPIs de análise -->
+      <div class="section-title"><i class="fa-solid fa-sliders"></i> Indicadores</div>
+      <div class="analysis-kpi-grid" id="analysisKpis">
+        <div class="loading">
+          <div class="spinner"></div> Carregando...
+        </div>
+      </div>
+
+      <!-- Linha 1: Heatmap (wide) -->
+      <div class="section-title"><i class="fa-solid fa-fire"></i> Mapa de Calor — Tráfego por Dia</div>
+      <div class="chart-card" style="margin-bottom:20px;">
+        <div class="chart-header">
+          <div class="chart-header-left">
+            <i class="fa-solid fa-calendar-week" style="color:var(--muted);font-size:13px;"></i>
+            <span class="chart-title" style="font-size:13px;">Atividade nos últimos 12 meses</span>
+          </div>
+          <span class="chart-badge" id="heatmapLegendLabel">RX + TX</span>
+        </div>
+        <div class="heatmap-outer" id="heatmapOuter">
+          <div class="loading">
+            <div class="spinner"></div> Carregando...
+          </div>
+        </div>
+        <div class="heatmap-legend">
+          Menos
+          <div class="heatmap-legend-cells" id="heatmapLegendCells"></div>
+          Mais
+        </div>
+      </div>
+
+      <!-- Linha 2: Tendência + Proporção -->
+      <div class="analysis-row">
+        <div class="chart-card">
+          <div class="chart-header">
+            <div class="chart-header-left">
+              <i class="fa-solid fa-chart-line" style="color:var(--muted);font-size:13px;"></i>
+              <span class="chart-title" style="font-size:13px;">Tendência Diária</span>
+            </div>
+            <span class="chart-badge">Média 7d</span>
+          </div>
+          <canvas id="trendChart" style="max-height:240px;"></canvas>
+        </div>
+        <div class="chart-card">
+          <div class="chart-header">
+            <div class="chart-header-left">
+              <i class="fa-solid fa-chart-pie" style="color:var(--muted);font-size:13px;"></i>
+              <span class="chart-title" style="font-size:13px;">Proporção RX / TX</span>
+            </div>
+          </div>
+          <canvas id="ratioChart" style="max-height:240px;"></canvas>
+        </div>
+      </div>
+
+      <!-- Linha 3: Top dias -->
+      <div class="section-title"><i class="fa-solid fa-ranking-star"></i> Top 10 — Dias com Mais Tráfego</div>
+      <div class="chart-card">
+        <table class="top-table" id="topDaysTable">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Data</th>
+              <th style="width:40%;">Volume</th>
+              <th>RX</th>
+              <th>TX</th>
+              <th style="text-align:right;">Total</th>
+            </tr>
+          </thead>
+          <tbody id="topDaysTbody">
+            <tr>
+              <td colspan="6">
+                <div class="loading">
+                  <div class="spinner"></div> Carregando...
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div><!-- /tab-analysis -->
   </main>
 
   <script>
