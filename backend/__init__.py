@@ -17,8 +17,13 @@ jwt = JWTManager()
 
 
 def create_app(config_override: dict | None = None) -> Flask:
-    app = Flask(__name__, template_folder="../frontend/templates",
-                static_folder="../frontend/static")
+    # ── Mapeamento Dinâmico de Caminhos Absolutos (Correção para Docker) ──
+    backend_dir = os.path.abspath(os.path.dirname(__file__))
+    project_root = os.path.abspath(os.path.join(backend_dir, ".."))
+    template_dir = os.path.join(project_root, "frontend", "templates")
+    static_dir = os.path.join(project_root, "frontend", "static")
+
+    app = Flask(__name__, template_folder=template_dir, static_folder=static_dir)
 
     # ── Core config ─────────────────────────────────────────────────────
     app.config.update(
@@ -55,11 +60,11 @@ def create_app(config_override: dict | None = None) -> Flask:
     app.register_blueprint(collector_bp, url_prefix="/api/collector")
     app.register_blueprint(pages_bp)
 
-    # ── ROTA EXPLÍCITA DO FAVICON ATUALIZADA PARA SVG ─────────────────────
+    # ── ROTA EXPLÍCITA DO FAVICON (Corrigida para usar a pasta estática real) ──
     @app.route('/favicon.svg')
     def favicon():
         return send_from_directory(
-            os.path.join(app.root_path, 'static'),
+            app.static_folder,
             'favicon.svg', 
             mimetype='image/svg+xml'
         )
