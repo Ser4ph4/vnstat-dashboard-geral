@@ -291,13 +291,13 @@
       interaction: { mode: 'index', intersect: false },
       plugins: {
         legend: {
-          position: 'top',
+          position: 'bottom',
           labels: {
             color: '#94a3b8',
             font: { ...CHART_FONTS, size: 10 },
-            padding: 10,
-            usePointStyle: true,
-            pointStyleWidth: 5,
+            padding: 16,
+            boxWidth: 12,
+            boxHeight: 12
           }
         },
         tooltip: {
@@ -307,7 +307,7 @@
           titleFont: { ...CHART_FONTS, size: 12 },
           bodyFont: { ...CHART_FONTS, size: 11 },
           padding: 10,
-          callbacks: { label: ctx => ' ' + ctx.dataset.label + ': ' + formatBytes(ctx.parsed.y) },
+          callbacks: { label: ctx => ` ${ctx.dataset.label}: ${formatBytes(ctx.parsed.y)}` },
         },
       },
       scales: {
@@ -329,41 +329,50 @@
           apiFetch('/api/chart/monthly'),
         ]);
 
-        // Daily
-        if (!daily.labels || daily.labels.length === 0) {
-          document.getElementById('dailyChart').style.display = 'none';
-          document.getElementById('dailyChartEmpty').style.display = 'flex';
-        } else {
-          document.getElementById('dailyChart').style.display = '';
-          document.getElementById('dailyChartEmpty').style.display = 'none';
+        // Helper rápido para alternar exibição de container vazio
+        const toggleChartContainer = (id, hasData) => {
+          document.getElementById(id).style.display = hasData ? '' : 'none';
+          document.getElementById(`${id}Empty`).style.display = hasData ? 'none' : 'flex';
+        };
+
+        // Daily Chart
+        const hasDaily = daily?.labels?.length > 0;
+        toggleChartContainer('dailyChart', hasDaily);
+
+        if (hasDaily) {
           const ctx = document.getElementById('dailyChart').getContext('2d');
           if (dailyChartInstance) dailyChartInstance.destroy();
+
           const hostNames = [...new Set(daily.datasets.map(d => d.host))];
           const datasets = [];
+
           hostNames.forEach((host, i) => {
             const rx = daily.datasets.find(d => d.host === host && d.type === 'rx');
             const tx = daily.datasets.find(d => d.host === host && d.type === 'tx');
-            if (rx) datasets.push({ label: rx.label, data: rx.data.map(Number), backgroundColor: RX_COLORS[i % 3] + 'bb', borderColor: RX_COLORS[i % 3], borderRadius: 3, borderWidth: 1 });
-            if (tx) datasets.push({ label: tx.label, data: tx.data.map(Number), backgroundColor: TX_COLORS[i % 3] + 'bb', borderColor: TX_COLORS[i % 3], borderRadius: 3, borderWidth: 1 });
+            const config = { borderRadius: 3, borderWidth: 1, data: [] };
+
+            if (rx) datasets.push({ ...config, label: rx.label, data: rx.data.map(Number), backgroundColor: RX_COLORS[i % 3] + 'bb', borderColor: RX_COLORS[i % 3] });
+            if (tx) datasets.push({ ...config, label: tx.label, data: tx.data.map(Number), backgroundColor: TX_COLORS[i % 3] + 'bb', borderColor: TX_COLORS[i % 3] });
           });
+
           dailyChartInstance = new Chart(ctx, { type: 'bar', data: { labels: daily.labels, datasets }, options: baseOpts() });
         }
 
-        // Monthly
-        if (!monthly.labels || monthly.labels.length === 0) {
-          document.getElementById('monthlyChart').style.display = 'none';
-          document.getElementById('monthlyChartEmpty').style.display = 'flex';
-        } else {
-          document.getElementById('monthlyChart').style.display = '';
-          document.getElementById('monthlyChartEmpty').style.display = 'none';
+        // Monthly Chart
+        const hasMonthly = monthly?.labels?.length > 0;
+        toggleChartContainer('monthlyChart', hasMonthly);
+
+        if (hasMonthly) {
           const ctx = document.getElementById('monthlyChart').getContext('2d');
           if (monthlyChartInstance) monthlyChartInstance.destroy();
+
           const datasets = [];
           monthly.datasets.forEach((ds, i) => {
             const c = RX_COLORS[i % 3];
-            datasets.push({ label: ds.label + ' ↓', data: (ds.rx || []).map(Number), borderColor: c, backgroundColor: c + '22', borderWidth: 2, tension: 0.4, fill: true, pointRadius: 3, pointHoverRadius: 5 });
-            datasets.push({ label: ds.label + ' ↑', data: (ds.tx || []).map(Number), borderColor: c + '88', backgroundColor: 'transparent', borderWidth: 1.5, tension: 0.4, fill: false, borderDash: [4, 3], pointRadius: 2, pointHoverRadius: 4 });
+            datasets.push({ label: `${ds.label} ↓`, data: (ds.rx || []).map(Number), borderColor: c, backgroundColor: c + '22', borderWidth: 2, tension: 0.4, fill: true, pointRadius: 3, pointHoverRadius: 5 });
+            datasets.push({ label: `${ds.label} ↑`, data: (ds.tx || []).map(Number), borderColor: c + '88', backgroundColor: 'transparent', borderWidth: 1.5, tension: 0.4, fill: false, borderDash: [4, 3], pointRadius: 2, pointHoverRadius: 4 });
           });
+
           monthlyChartInstance = new Chart(ctx, { type: 'line', data: { labels: monthly.labels, datasets }, options: baseOpts() });
         }
       } catch (err) {
