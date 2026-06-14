@@ -8,7 +8,7 @@
   <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=1">
   <link rel="stylesheet" href="/static/css/all.min.css">
   <link rel="stylesheet" href="/static/css/fonts.css">
-  <link rel="stylesheet" href="/static/css/style.css?v=5">
+  <link rel="stylesheet" href="/static/css/style.css">
   <script src="/static/js/chart.umd.min.js"></script>
 </head>
 
@@ -239,9 +239,8 @@
         // Hosts
         renderHosts(data.hosts);
 
-        // Activity panels
-        renderTopDays(data.top_days || []);
-        renderMonthBreakdown(data.hosts);
+        // Month breakdown: fetch per-host monthly data in parallel
+        loadMonthBreakdown(data.hosts);
 
         // Timestamp
         const now = new Date();
@@ -250,6 +249,32 @@
 
       } catch (err) {
         console.error('loadOverview:', err);
+      }
+    }
+
+    // Fetch current month rx/tx per host from /api/host/<name>
+    async function loadMonthBreakdown(hosts) {
+      try {
+        const results = await Promise.all(
+          hosts.map(h =>
+            apiFetch(`/api/host/${h.name}`)
+              .then(d => {
+                // Find current month in the months array
+                const now = new Date();
+                const label = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+                const monthEntry = (d.months || []).find(m => m.label === label);
+                return {
+                  name: h.display_name,
+                  rx: monthEntry ? monthEntry.rx : 0,
+                  tx: monthEntry ? monthEntry.tx : 0,
+                };
+              })
+              .catch(() => ({ name: h.display_name, rx: 0, tx: 0 }))
+          )
+        );
+        renderMonthBreakdown(results);
+      } catch (err) {
+        console.error('loadMonthBreakdown:', err);
       }
     }
 
@@ -343,34 +368,57 @@
       `).join('');
     }
 
-    function renderTopDays(topDays) {
+    // Derives top 7 days from already-loaded daily chart data
+    // dailyData = { labels: [...dates], datasets: [{host, type:'rx'|'tx', data:[...]}, ...] }
+    function renderTopDays(dailyData) {
       const el = document.getElementById('topDaysContent');
-      if (!topDays || topDays.length === 0) {
+      if (!dailyData || !dailyData.labels || dailyData.labels.length === 0) {
         el.innerHTML = `<div class="empty-msg" style="height:120px;">
           <i class="fa-solid fa-hourglass-half"></i>
           <span>Sem dados suficientes ainda</span>
         </div>`;
         return;
       }
-      const max = topDays[0]?.total || 1;
+
+      // Sum rx+tx across all hosts per date
+      const totalsMap = {};
+      dailyData.labels.forEach((label, i) => {
+        let total = 0;
+        dailyData.datasets.forEach(ds => { total += Number(ds.data[i] || 0); });
+        totalsMap[label] = total;
+      });
+
+      const sorted = Object.entries(totalsMap)
+        .map(([date, total]) => ({ date, total }))
+        .filter(d => d.total > 0)
+        .sort((a, b) => b.total - a.total)
+        .slice(0, 7);
+
+      if (sorted.length === 0) {
+        el.innerHTML = `<div class="empty-msg" style="height:120px;">
+          <i class="fa-solid fa-hourglass-half"></i>
+          <span>Sem dados suficientes ainda</span>
+        </div>`;
+        return;
+      }
+
+      const max = sorted[0].total;
       el.innerHTML = `
         <table class="top-table">
           <thead>
             <tr>
               <th>#</th>
               <th>Dia</th>
-              <th>Host</th>
               <th></th>
-              <th style="text-align:right">Total</th>
+              <th style="text-align:right">Total (RX+TX)</th>
             </tr>
           </thead>
           <tbody>
-            ${topDays.slice(0, 7).map((d, i) => `
+            ${sorted.map((d, i) => `
               <tr>
                 <td class="top-rank">${i + 1}</td>
                 <td>${d.date}</td>
-                <td style="color:var(--muted);font-size:11px;">${d.host || '—'}</td>
-                <td style="width:80px;">
+                <td style="width:90px;">
                   <div class="bar-bg">
                     <div class="bar-fill" style="width:${Math.round((d.total / max) * 100)}%"></div>
                   </div>
@@ -383,19 +431,18 @@
       `;
     }
 
-    function renderMonthBreakdown(hosts) {
+    // Receives [{name, rx, tx}] already resolved from per-host API calls
+    function renderMonthBreakdown(hostData) {
       const el = document.getElementById('monthBreakdownContent');
-      if (!hosts || hosts.length === 0) {
+      if (!hostData || hostData.length === 0) {
         el.innerHTML = `<div class="empty-msg" style="height:120px;"><i class="fa-solid fa-hourglass-half"></i></div>`;
         return;
       }
-      const totals = hosts.map(h => ({
-        name: h.display_name,
-        rx: h.month_rx || 0,
-        tx: h.month_tx || 0,
-        total: (h.month_rx || 0) + (h.month_tx || 0),
-      })).sort((a, b) => b.total - a.total);
-      const max = totals[0]?.total || 1;
+
+      const sorted = hostData
+        .map(h => ({ ...h, total: (h.rx || 0) + (h.tx || 0) }))
+        .sort((a, b) => b.total - a.total);
+      const max = sorted[0]?.total || 1;
 
       el.innerHTML = `
         <table class="top-table">
@@ -409,7 +456,7 @@
             </tr>
           </thead>
           <tbody>
-            ${totals.map(h => `
+            ${sorted.map(h => `
               <tr>
                 <td style="font-weight:600;color:var(--text);">${h.name}</td>
                 <td style="color:var(--rx)">${formatBytes(h.rx)}</td>
@@ -471,6 +518,9 @@
           apiFetch('/api/chart/monthly'),
           apiFetch('/api/chart/hourly').catch(() => null),
         ]);
+
+        // Top 7 days derived from daily data (no extra endpoint needed)
+        renderTopDays(daily);
 
         // Daily
         if (!daily.labels || daily.labels.length === 0) {
