@@ -298,35 +298,29 @@
             padding: 10,
             usePointStyle: true,
             pointStyleWidth: 5,
-            pointStyle: ctx => {
-              const dataset = ctx.dataset;
-              if (dataset.type === 'line') return 'circle';
-              if (dataset.label.endsWith('↓')) return 'rect';
-              if (dataset.label.endsWith('↑')) return 'triangle';
-              return 'circle';
-            }
-          },
-          tooltip: {
-            backgroundColor: '#0d1117',
-            borderColor: '#1e293b',
-            borderWidth: 1,
-            titleFont: { ...CHART_FONTS, size: 12 },
-            bodyFont: { ...CHART_FONTS, size: 11 },
-            padding: 10,
-            callbacks: { label: ctx => ' ' + ctx.dataset.label + ': ' + formatBytes(ctx.parsed.y) },
-          },
+          }
         },
-        scales: {
-          x: {
-            grid: { color: 'rgba(30,41,59,0.5)' },
-            ticks: { color: '#475569', maxTicksLimit: 10, font: { ...CHART_FONTS, size: 10 } }
-          },
-          y: {
-            grid: { color: 'rgba(30,41,59,0.5)' },
-            ticks: { color: '#475569', font: { ...CHART_FONTS, size: 10 }, callback: v => formatBytes(v) }
-          },
+        tooltip: {
+          backgroundColor: '#0d1117',
+          borderColor: '#1e293b',
+          borderWidth: 1,
+          titleFont: { ...CHART_FONTS, size: 12 },
+          bodyFont: { ...CHART_FONTS, size: 11 },
+          padding: 10,
+          callbacks: { label: ctx => ' ' + ctx.dataset.label + ': ' + formatBytes(ctx.parsed.y) },
         },
-      });
+      },
+      scales: {
+        x: {
+          grid: { color: 'rgba(30,41,59,0.5)' },
+          ticks: { color: '#475569', maxTicksLimit: 10, font: { ...CHART_FONTS, size: 10 } }
+        },
+        y: {
+          grid: { color: 'rgba(30,41,59,0.5)' },
+          ticks: { color: '#475569', font: { ...CHART_FONTS, size: 10 }, callback: v => formatBytes(v) }
+        },
+      },
+    });
 
     async function loadCharts() {
       try {
