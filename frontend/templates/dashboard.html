@@ -13,10 +13,8 @@
 </head>
 
 <body>
-  <!-- ── HEADER ──────────────────────────────────────────────────── -->
   <header>
     <div class="header-left">
-      <!-- Logo -->
       <a class="header-logo" href="/">
         <div class="header-logo-icon">
           <svg viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5" stroke-linecap="round"
@@ -29,7 +27,6 @@
 
       <div class="header-sep"></div>
 
-      <!-- Status pill -->
       <div class="header-status-pill" id="headerStatusPill">
         <div class="header-status-dot" id="headerStatusDot"></div>
         <span id="headerStatusText">—</span>
@@ -47,10 +44,8 @@
     </div>
   </header>
 
-  <!-- ── MAIN ────────────────────────────────────────────────────── -->
   <main>
 
-    <!-- KPIs agregados -->
     <div class="section-header">
       <div class="section-title">
         <i class="fa-solid fa-chart-pie"></i> Agregado Total
@@ -63,7 +58,6 @@
       </div>
     </div>
 
-    <!-- Hosts -->
     <div class="section-header" style="margin-top: 36px;">
       <div class="section-title">
         <i class="fa-solid fa-network-wired"></i> Hosts
@@ -76,7 +70,6 @@
       </div>
     </div>
 
-    <!-- Gráficos -->
     <div class="section-header" style="margin-top: 36px;">
       <div class="section-title">
         <i class="fa-solid fa-chart-line"></i> Tráfego
@@ -113,51 +106,6 @@
       </div>
     </div>
 
-    <!-- Atividade -->
-    <div class="section-header" style="margin-top: 36px;">
-      <div class="section-title">
-        <i class="fa-solid fa-bolt"></i> Atividade
-      </div>
-    </div>
-    <div class="activity-strip">
-      <!-- Top dias por tráfego -->
-      <div class="activity-card">
-        <div class="activity-title">
-          <i class="fa-solid fa-trophy"></i> Top 7 — Dias com mais tráfego
-        </div>
-        <div id="topDaysContent">
-          <div class="loading">
-            <div class="spinner"></div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Breakdown por host (mês atual) -->
-      <div class="activity-card">
-        <div class="activity-title">
-          <i class="fa-solid fa-chart-bar"></i> Breakdown — Mês atual por host
-        </div>
-        <div id="monthBreakdownContent">
-          <div class="loading">
-            <div class="spinner"></div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Última semana hora-a-hora (sparkline) -->
-      <div class="activity-card">
-        <div class="activity-title">
-          <i class="fa-solid fa-wave-square"></i> Última semana — por hora
-        </div>
-        <canvas id="hourlyChart" style="max-height:180px;"></canvas>
-        <div id="hourlyEmpty" style="display:none;" class="empty-msg">
-          <i class="fa-solid fa-circle-exclamation"></i>
-          <span>Sem dados horários disponíveis</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Rodapé -->
     <div class="last-updated">
       <i class="fa-solid fa-clock"></i>
       <span id="lastUpdatedTime">—</span>
@@ -170,8 +118,6 @@
     // ── State ────────────────────────────────────────────────────────────
     let dailyChartInstance = null;
     let monthlyChartInstance = null;
-    let hourlyChartInstance = null;
-    let overviewData = null;
 
     const CHART_FONTS = { family: 'IBM Plex Mono, monospace' };
     const RX_COLORS = ['#38bdf8', '#34d399', '#a78bfa'];
@@ -217,7 +163,6 @@
       try {
         const res = await fetch('/api/overview');
         const data = await res.json();
-        overviewData = data;
 
         // Status pill
         const onlineCount = data.hosts.filter(h => h.online).length;
@@ -239,9 +184,6 @@
         // Hosts
         renderHosts(data.hosts);
 
-        // Month breakdown: fetch per-host monthly data in parallel
-        loadMonthBreakdown(data.hosts);
-
         // Timestamp
         const now = new Date();
         document.getElementById('lastUpdatedTime').textContent =
@@ -249,32 +191,6 @@
 
       } catch (err) {
         console.error('loadOverview:', err);
-      }
-    }
-
-    // Fetch current month rx/tx per host from /api/host/<name>
-    async function loadMonthBreakdown(hosts) {
-      try {
-        const results = await Promise.all(
-          hosts.map(h =>
-            apiFetch(`/api/host/${h.name}`)
-              .then(d => {
-                // Find current month in the months array
-                const now = new Date();
-                const label = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
-                const monthEntry = (d.months || []).find(m => m.label === label);
-                return {
-                  name: h.display_name,
-                  rx: monthEntry ? monthEntry.rx : 0,
-                  tx: monthEntry ? monthEntry.tx : 0,
-                };
-              })
-              .catch(() => ({ name: h.display_name, rx: 0, tx: 0 }))
-          )
-        );
-        renderMonthBreakdown(results);
-      } catch (err) {
-        console.error('loadMonthBreakdown:', err);
       }
     }
 
@@ -368,112 +284,6 @@
       `).join('');
     }
 
-    // Derives top 7 days from already-loaded daily chart data
-    // dailyData = { labels: [...dates], datasets: [{host, type:'rx'|'tx', data:[...]}, ...] }
-    function renderTopDays(dailyData) {
-      const el = document.getElementById('topDaysContent');
-      if (!dailyData || !dailyData.labels || dailyData.labels.length === 0) {
-        el.innerHTML = `<div class="empty-msg" style="height:120px;">
-          <i class="fa-solid fa-hourglass-half"></i>
-          <span>Sem dados suficientes ainda</span>
-        </div>`;
-        return;
-      }
-
-      // Sum rx+tx across all hosts per date
-      const totalsMap = {};
-      dailyData.labels.forEach((label, i) => {
-        let total = 0;
-        dailyData.datasets.forEach(ds => { total += Number(ds.data[i] || 0); });
-        totalsMap[label] = total;
-      });
-
-      const sorted = Object.entries(totalsMap)
-        .map(([date, total]) => ({ date, total }))
-        .filter(d => d.total > 0)
-        .sort((a, b) => b.total - a.total)
-        .slice(0, 7);
-
-      if (sorted.length === 0) {
-        el.innerHTML = `<div class="empty-msg" style="height:120px;">
-          <i class="fa-solid fa-hourglass-half"></i>
-          <span>Sem dados suficientes ainda</span>
-        </div>`;
-        return;
-      }
-
-      const max = sorted[0].total;
-      el.innerHTML = `
-        <table class="top-table">
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Dia</th>
-              <th></th>
-              <th style="text-align:right">Total (RX+TX)</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${sorted.map((d, i) => `
-              <tr>
-                <td class="top-rank">${i + 1}</td>
-                <td>${d.date}</td>
-                <td style="width:90px;">
-                  <div class="bar-bg">
-                    <div class="bar-fill" style="width:${Math.round((d.total / max) * 100)}%"></div>
-                  </div>
-                </td>
-                <td class="top-total">${formatBytes(d.total)}</td>
-              </tr>
-            `).join('')}
-          </tbody>
-        </table>
-      `;
-    }
-
-    // Receives [{name, rx, tx}] already resolved from per-host API calls
-    function renderMonthBreakdown(hostData) {
-      const el = document.getElementById('monthBreakdownContent');
-      if (!hostData || hostData.length === 0) {
-        el.innerHTML = `<div class="empty-msg" style="height:120px;"><i class="fa-solid fa-hourglass-half"></i></div>`;
-        return;
-      }
-
-      const sorted = hostData
-        .map(h => ({ ...h, total: (h.rx || 0) + (h.tx || 0) }))
-        .sort((a, b) => b.total - a.total);
-      const max = sorted[0]?.total || 1;
-
-      el.innerHTML = `
-        <table class="top-table">
-          <thead>
-            <tr>
-              <th>Host</th>
-              <th style="color:var(--rx)">Down</th>
-              <th style="color:var(--tx)">Up</th>
-              <th></th>
-              <th style="text-align:right">Total</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${sorted.map(h => `
-              <tr>
-                <td style="font-weight:600;color:var(--text);">${h.name}</td>
-                <td style="color:var(--rx)">${formatBytes(h.rx)}</td>
-                <td style="color:var(--tx)">${formatBytes(h.tx)}</td>
-                <td style="width:60px;">
-                  <div class="bar-bg">
-                    <div class="bar-fill" style="width:${Math.round((h.total / max) * 100)}%"></div>
-                  </div>
-                </td>
-                <td class="top-total">${formatBytes(h.total)}</td>
-              </tr>
-            `).join('')}
-          </tbody>
-        </table>
-      `;
-    }
-
     // ── Charts ───────────────────────────────────────────────────────────
     const baseOpts = () => ({
       responsive: true,
@@ -513,14 +323,10 @@
 
     async function loadCharts() {
       try {
-        const [daily, monthly, hourly] = await Promise.all([
+        const [daily, monthly] = await Promise.all([
           apiFetch('/api/chart/daily?days=30'),
           apiFetch('/api/chart/monthly'),
-          apiFetch('/api/chart/hourly').catch(() => null),
         ]);
-
-        // Top 7 days derived from daily data (no extra endpoint needed)
-        renderTopDays(daily);
 
         // Daily
         if (!daily.labels || daily.labels.length === 0) {
@@ -559,46 +365,6 @@
           });
           monthlyChartInstance = new Chart(ctx, { type: 'line', data: { labels: monthly.labels, datasets }, options: baseOpts() });
         }
-
-        // Hourly (last 7 days)
-        if (hourly && hourly.labels && hourly.labels.length > 0) {
-          document.getElementById('hourlyChart').style.display = '';
-          document.getElementById('hourlyEmpty').style.display = 'none';
-          const ctx = document.getElementById('hourlyChart').getContext('2d');
-          if (hourlyChartInstance) hourlyChartInstance.destroy();
-          const opts = baseOpts();
-          opts.plugins.legend.display = false;
-          hourlyChartInstance = new Chart(ctx, {
-            type: 'line',
-            data: {
-              labels: hourly.labels,
-              datasets: [{
-                label: 'RX',
-                data: (hourly.rx || []).map(Number),
-                borderColor: '#38bdf8',
-                backgroundColor: 'rgba(56,189,248,0.08)',
-                borderWidth: 1.5,
-                tension: 0.4,
-                fill: true,
-                pointRadius: 0,
-              }, {
-                label: 'TX',
-                data: (hourly.tx || []).map(Number),
-                borderColor: '#f472b6',
-                backgroundColor: 'transparent',
-                borderWidth: 1.5,
-                tension: 0.4,
-                fill: false,
-                pointRadius: 0,
-              }]
-            },
-            options: opts,
-          });
-        } else {
-          document.getElementById('hourlyChart').style.display = 'none';
-          document.getElementById('hourlyEmpty').style.display = 'flex';
-        }
-
       } catch (err) {
         console.error('[charts]', err);
       }
