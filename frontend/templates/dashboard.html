@@ -285,43 +285,117 @@
     }
 
     // ── Charts ───────────────────────────────────────────────────────────
+    // ── Charts (Dracula Theme) ──────────────────────────────────────────────
     const baseOpts = () => ({
       responsive: true,
       maintainAspectRatio: true,
-      interaction: { mode: 'index', intersect: false },
+
+      interaction: {
+        mode: 'index',
+        intersect: false
+      },
+
+      elements: {
+        line: {
+          tension: 0.35,
+          borderWidth: 2.5
+        },
+        point: {
+          radius: 0,
+          hoverRadius: 5,
+          hoverBorderWidth: 2
+        }
+      },
+
       plugins: {
         legend: {
           position: 'top',
           labels: {
-            color: '#94a3b8',
-            font: { ...CHART_FONTS, size: 10 },
-            padding: 10,
+            color: '#f8f8f2',
+            font: {
+              ...CHART_FONTS,
+              size: 11,
+              weight: '600'
+            },
+            padding: 14,
             usePointStyle: true,
-            pointStyleWidth: 7,
+            pointStyle: 'circle',
+            pointStyleWidth: 8
           }
         },
+
         tooltip: {
-          backgroundColor: '#0d1117',
-          borderColor: '#1e293b',
+          backgroundColor: '#282a36',
+          borderColor: '#44475a',
           borderWidth: 1,
-          titleFont: { ...CHART_FONTS, size: 12 },
-          bodyFont: { ...CHART_FONTS, size: 11 },
-          padding: 10,
-          callbacks: { label: ctx => ' ' + ctx.dataset.label + ': ' + formatBytes(ctx.parsed.y) },
-        },
+          cornerRadius: 12,
+          padding: 12,
+
+          titleColor: '#f8f8f2',
+          bodyColor: '#f8f8f2',
+
+          titleFont: {
+            ...CHART_FONTS,
+            size: 12,
+            weight: '600'
+          },
+
+          bodyFont: {
+            ...CHART_FONTS,
+            size: 11
+          },
+
+          displayColors: true,
+
+          callbacks: {
+            label: ctx =>
+              ' ' + ctx.dataset.label + ': ' + formatBytes(ctx.parsed.y)
+          }
+        }
       },
+
       scales: {
         x: {
-          grid: { color: 'rgba(30,41,59,0.5)' },
-          ticks: { color: '#475569', maxTicksLimit: 10, font: { ...CHART_FONTS, size: 10 } }
-        },
-        y: {
-          grid: { color: 'rgba(30,41,59,0.5)' },
-          ticks: { color: '#475569', font: { ...CHART_FONTS, size: 10 }, callback: v => formatBytes(v) }
-        },
-      },
-    });
+          border: {
+            display: false
+          },
 
+          grid: {
+            drawBorder: false,
+            color: 'rgba(68,71,90,0.35)'
+          },
+
+          ticks: {
+            color: '#6272a4',
+            maxTicksLimit: 10,
+            font: {
+              ...CHART_FONTS,
+              size: 10
+            }
+          }
+        },
+
+        y: {
+          border: {
+            display: false
+          },
+
+          grid: {
+            drawBorder: false,
+            color: 'rgba(68,71,90,0.35)'
+          },
+
+          ticks: {
+            color: '#6272a4',
+            font: {
+              ...CHART_FONTS,
+              size: 10
+            },
+            callback: v => formatBytes(v)
+          }
+        }
+      }
+    });
     async function loadCharts() {
       try {
         const [daily, monthly] = await Promise.all([
