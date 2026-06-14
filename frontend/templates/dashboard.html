@@ -13,291 +13,564 @@
 </head>
 
 <body>
+  <!-- ── HEADER ──────────────────────────────────────────────────── -->
   <header>
-    <div class="header-logo">
-      <div class="header-logo-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2" stroke-linecap="round">
-          <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
-        </svg>
+    <div class="header-left">
+      <!-- Logo -->
+      <a class="header-logo" href="/">
+        <div class="header-logo-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5" stroke-linecap="round"
+            stroke-linejoin="round">
+            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+          </svg>
+        </div>
+        <span class="header-logo-text">Vn<span>Stat</span></span>
+      </a>
+
+      <div class="header-sep"></div>
+
+      <!-- Status pill -->
+      <div class="header-status-pill" id="headerStatusPill">
+        <div class="header-status-dot" id="headerStatusDot"></div>
+        <span id="headerStatusText">—</span>
       </div>
-      <span>Vn<span>Stat - Dashboard</span></span>
     </div>
+
     <div class="header-right">
-      <div class="user-badge" id="userBadge"><i class="fa-solid fa-user"></i> —</div>
-      <button class="btn-logout" onclick="doLogout()"><i class="fa-solid fa-right-from-bracket"></i> Sair</button>
+      <button class="btn-refresh" onclick="refreshAll()" title="Atualizar dados">
+        <i class="fa-solid fa-rotate-right" id="refreshIcon"></i> Atualizar
+      </button>
+      <div class="user-badge" id="userBadge"><i class="fa-solid fa-circle-user"></i> —</div>
+      <button class="btn-logout" onclick="doLogout()">
+        <i class="fa-solid fa-right-from-bracket"></i> Sair
+      </button>
     </div>
   </header>
 
+  <!-- ── MAIN ────────────────────────────────────────────────────── -->
   <main>
-    <div class="section-title"><i class="fa-solid fa-chart-pie"></i> Agregado Total</div>
+
+    <!-- KPIs agregados -->
+    <div class="section-header">
+      <div class="section-title">
+        <i class="fa-solid fa-chart-pie"></i> Agregado Total
+      </div>
+      <div class="section-meta" id="kpiMeta">—</div>
+    </div>
     <div class="kpi-grid" id="kpiGrid">
       <div class="loading">
         <div class="spinner"></div> Carregando...
       </div>
     </div>
 
-    <div class="section-title" style="margin-top: 32px;"><i class="fa-solid fa-network-wired"></i> Hosts</div>
+    <!-- Hosts -->
+    <div class="section-header" style="margin-top: 36px;">
+      <div class="section-title">
+        <i class="fa-solid fa-network-wired"></i> Hosts
+      </div>
+      <div class="section-meta" id="hostsMeta">—</div>
+    </div>
     <div class="hosts-grid" id="hostsGrid">
       <div class="loading">
         <div class="spinner"></div> Carregando...
       </div>
     </div>
 
-    <div class="section-title" style="margin-top: 32px;"><i class="fa-solid fa-chart-line"></i> Gráficos</div>
-    <div class="charts-grid">
-      <div class="chart-card">
-        <div class="chart-title">Últimos 30 dias (host)</div>
-        <canvas id="dailyChart"></canvas>
-      </div>
-      <div class="chart-card">
-        <div class="chart-title">Últimos 12 meses (agregado)</div>
-        <canvas id="monthlyChart"></canvas>
+    <!-- Gráficos -->
+    <div class="section-header" style="margin-top: 36px;">
+      <div class="section-title">
+        <i class="fa-solid fa-chart-line"></i> Tráfego
       </div>
     </div>
+    <div class="charts-grid">
+      <div class="chart-card">
+        <div class="chart-header">
+          <div class="chart-header-left">
+            <i class="fa-solid fa-calendar-week"></i>
+            <span class="chart-title">Últimos 30 dias</span>
+          </div>
+          <span class="chart-badge">por host</span>
+        </div>
+        <canvas id="dailyChart"></canvas>
+        <div id="dailyChartEmpty" style="display:none;" class="empty-msg">
+          <i class="fa-solid fa-circle-exclamation"></i>
+          <span>Aguardando dados (próximos ciclos do coletor)</span>
+        </div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-header">
+          <div class="chart-header-left">
+            <i class="fa-solid fa-calendar-days"></i>
+            <span class="chart-title">Últimos 12 meses</span>
+          </div>
+          <span class="chart-badge">agregado</span>
+        </div>
+        <canvas id="monthlyChart"></canvas>
+        <div id="monthlyChartEmpty" style="display:none;" class="empty-msg">
+          <i class="fa-solid fa-circle-exclamation"></i>
+          <span>Aguardando dados mensais</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Atividade -->
+    <div class="section-header" style="margin-top: 36px;">
+      <div class="section-title">
+        <i class="fa-solid fa-bolt"></i> Atividade
+      </div>
+    </div>
+    <div class="activity-strip">
+      <!-- Top dias por tráfego -->
+      <div class="activity-card">
+        <div class="activity-title">
+          <i class="fa-solid fa-trophy"></i> Top 7 — Dias com mais tráfego
+        </div>
+        <div id="topDaysContent">
+          <div class="loading">
+            <div class="spinner"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Breakdown por host (mês atual) -->
+      <div class="activity-card">
+        <div class="activity-title">
+          <i class="fa-solid fa-chart-bar"></i> Breakdown — Mês atual por host
+        </div>
+        <div id="monthBreakdownContent">
+          <div class="loading">
+            <div class="spinner"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Última semana hora-a-hora (sparkline) -->
+      <div class="activity-card">
+        <div class="activity-title">
+          <i class="fa-solid fa-wave-square"></i> Última semana — por hora
+        </div>
+        <canvas id="hourlyChart" style="max-height:180px;"></canvas>
+        <div id="hourlyEmpty" style="display:none;" class="empty-msg">
+          <i class="fa-solid fa-circle-exclamation"></i>
+          <span>Sem dados horários disponíveis</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Rodapé -->
+    <div class="last-updated">
+      <i class="fa-solid fa-clock"></i>
+      <span id="lastUpdatedTime">—</span>
+      &nbsp;·&nbsp; auto-refresh a cada 30s
+    </div>
+
   </main>
 
   <script>
+    // ── State ────────────────────────────────────────────────────────────
     let dailyChartInstance = null;
     let monthlyChartInstance = null;
+    let hourlyChartInstance = null;
+    let overviewData = null;
 
-    // ── Init ────────────────────────────────────────────────────────────
+    const CHART_FONTS = { family: 'IBM Plex Mono, monospace' };
+    const RX_COLORS = ['#38bdf8', '#34d399', '#a78bfa'];
+    const TX_COLORS = ['#f472b6', '#fb923c', '#facc15'];
+
+    // ── Init ─────────────────────────────────────────────────────────────
     document.addEventListener('DOMContentLoaded', () => {
       loadUser();
       loadOverview();
       loadCharts();
-      // Refresh every 30 seconds
-      setInterval(loadOverview, 30000);
+      setInterval(() => { loadOverview(); }, 30000);
     });
 
+    async function refreshAll() {
+      const icon = document.getElementById('refreshIcon');
+      icon.style.animation = 'spin .6s linear infinite';
+      await Promise.all([loadOverview(), loadCharts()]);
+      icon.style.animation = '';
+    }
+
+    // ── Auth ─────────────────────────────────────────────────────────────
     async function loadUser() {
       try {
         const res = await fetch('/api/auth/me');
-
-        if (res.status === 401 || res.status === 403) {
-          window.location.href = '/login';
-          return;
-        }
-
-        if (!res.ok) throw new Error(`Server error: ${res.status}`);
-
+        if (res.status === 401 || res.status === 403) { window.location.href = '/login'; return; }
+        if (!res.ok) throw new Error(`${res.status}`);
         const data = await res.json();
-        document.getElementById('userBadge').innerHTML = `<i class="fa-solid fa-user"></i> @ ${data.username}`;
+        document.getElementById('userBadge').innerHTML =
+          `<i class="fa-solid fa-circle-user"></i> ${data.username}`;
       } catch (err) {
-        console.error('Erro ao verificar usuário (pode ser lentidão):', err);
+        console.error('loadUser:', err);
       }
     }
 
+    async function doLogout() {
+      try { await fetch('/api/auth/logout', { method: 'POST' }); } finally {
+        window.location.href = '/login';
+      }
+    }
+
+    // ── Overview ─────────────────────────────────────────────────────────
     async function loadOverview() {
       try {
         const res = await fetch('/api/overview');
         const data = await res.json();
+        overviewData = data;
 
-        const kpiGrid = document.getElementById('kpiGrid');
-        kpiGrid.innerHTML = `
-          <div class="kpi-card">
-            <div class="kpi-header">
-              <div class="kpi-label">Total Recebido</div>
-              <i class="fa-solid fa-cloud-arrow-down kpi-icon"></i>
-            </div>
-            <div class="kpi-value">${data.total_rx_fmt}</div>
-            <div class="kpi-subtext">${formatBytes(data.total_rx)}</div>
-          </div>
-          <div class="kpi-card">
-            <div class="kpi-header">
-              <div class="kpi-label">Total Enviado</div>
-              <i class="fa-solid fa-cloud-arrow-up kpi-icon"></i>
-            </div>
-            <div class="kpi-value">${data.total_tx_fmt}</div>
-            <div class="kpi-subtext">${formatBytes(data.total_tx)}</div>
-          </div>
-<div class="kpi-card">
-  <div class="kpi-header">
-    <div class="kpi-label">Total Mês</div>
-    <i class="fa-solid fa-calendar-days kpi-icon"></i>
-  </div>
-  <div style="display: flex; gap: 16px; margin-top: 6px;">
-    <div style="flex: 1;">
-      <div class="kpi-value" style="color: var(--rx); font-size: 20px; margin-bottom: 0;">${data.month_rx_fmt}</div>
-      <div class="kpi-subtext" style="font-size: 11px; margin-top: 2px; color: var(--muted);"><i class="fa-solid fa-arrow-down" style="color: var(--rx);"></i> Down</div>
-    </div>
-    <div style="flex: 1; border-left: 1px solid var(--border); padding-left: 16px;">
-      <div class="kpi-value" style="color: var(--tx); font-size: 20px; margin-bottom: 0;">${data.month_tx_fmt}</div>
-      <div class="kpi-subtext" style="font-size: 11px; margin-top: 2px; color: var(--muted);"><i class="fa-solid fa-arrow-up" style="color: var(--tx);"></i> Up</div>
-    </div>
-  </div>
-</div>
-        `;
+        // Status pill
+        const onlineCount = data.hosts.filter(h => h.online).length;
+        const totalCount = data.hosts.length;
+        const allOnline = onlineCount === totalCount;
+        const dot = document.getElementById('headerStatusDot');
+        const txt = document.getElementById('headerStatusText');
+        dot.className = 'header-status-dot' + (allOnline ? '' : ' offline');
+        txt.textContent = `${onlineCount}/${totalCount} hosts online`;
 
-        // Host cards
-        const hostsGrid = document.getElementById('hostsGrid');
-        hostsGrid.innerHTML = data.hosts.map(h => `
-          <div class="host-card" onclick="goToHost('${h.name}')">
-            <div class="host-card-header">
-              <div class="host-title-wrapper">
-                <i class="fa-solid fa-server host-icon"></i>
-                <div class="host-name">${h.display_name}</div>
-              </div>
-              <div class="host-status ${h.online ? 'online' : 'offline'}" title="${h.online ? 'Online' : 'Offline'}"></div>
-            </div>
-            <div class="host-stat">
-              <div class="host-stat-label">Recebido Total</div>
-              <div class="host-stat-value rx">${h.rx_total_fmt}</div>
-            </div>
-            <div class="host-stat">
-              <div class="host-stat-label">Enviado Total</div>
-              <div class="host-stat-value tx">${h.tx_total_fmt}</div>
-            </div>
-          </div>
-        `).join('');
+        // Meta
+        document.getElementById('kpiMeta').textContent = `${totalCount} hosts rastreados`;
+        document.getElementById('hostsMeta').textContent =
+          `${onlineCount} online · ${totalCount - onlineCount} offline`;
+
+        // KPIs
+        renderKPIs(data);
+
+        // Hosts
+        renderHosts(data.hosts);
+
+        // Activity panels
+        renderTopDays(data.top_days || []);
+        renderMonthBreakdown(data.hosts);
+
+        // Timestamp
+        const now = new Date();
+        document.getElementById('lastUpdatedTime').textContent =
+          `Atualizado às ${now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}`;
+
       } catch (err) {
         console.error('loadOverview:', err);
       }
     }
 
-    async function apiFetch(url) {
-      const response = await fetch(url);
-      if (!response.ok) {
-        throw new Error(`Erro na requisição (${response.status}): ${response.statusText}`);
-      }
-      return response.json();
+    function renderKPIs(data) {
+      document.getElementById('kpiGrid').innerHTML = `
+        <div class="kpi-card">
+          <div class="kpi-header">
+            <div class="kpi-label">Total Recebido</div>
+            <i class="fa-solid fa-cloud-arrow-down kpi-icon"></i>
+          </div>
+          <div class="kpi-value rx">${data.total_rx_fmt}</div>
+          <div class="kpi-subtext">${formatBytes(data.total_rx)} bruto</div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-header">
+            <div class="kpi-label">Total Enviado</div>
+            <i class="fa-solid fa-cloud-arrow-up kpi-icon"></i>
+          </div>
+          <div class="kpi-value tx">${data.total_tx_fmt}</div>
+          <div class="kpi-subtext">${formatBytes(data.total_tx)} bruto</div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-header">
+            <div class="kpi-label">Total Combinado</div>
+            <i class="fa-solid fa-arrow-right-arrow-left kpi-icon"></i>
+          </div>
+          <div class="kpi-value">${formatBytes((data.total_rx || 0) + (data.total_tx || 0))}</div>
+          <div class="kpi-subtext">RX + TX acumulado</div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-header">
+            <div class="kpi-label">Este Mês</div>
+            <i class="fa-solid fa-calendar-days kpi-icon"></i>
+          </div>
+          <div class="kpi-split">
+            <div class="kpi-split-item">
+              <div class="kpi-split-value rx">${data.month_rx_fmt}</div>
+              <div class="kpi-split-label"><i class="fa-solid fa-arrow-down" style="color:var(--rx)"></i> Down</div>
+            </div>
+            <div class="kpi-split-item">
+              <div class="kpi-split-value tx">${data.month_tx_fmt}</div>
+              <div class="kpi-split-label"><i class="fa-solid fa-arrow-up" style="color:var(--tx)"></i> Up</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-header">
+            <div class="kpi-label">Hosts Online</div>
+            <i class="fa-solid fa-network-wired kpi-icon"></i>
+          </div>
+          <div class="kpi-value green">${data.hosts.filter(h => h.online).length}<span style="font-size:16px;color:var(--muted);font-weight:400">/${data.hosts.length}</span></div>
+          <div class="kpi-subtext">${data.hosts.filter(h => !h.online).length} offline agora</div>
+        </div>
+      `;
     }
+
+    function renderHosts(hosts) {
+      document.getElementById('hostsGrid').innerHTML = hosts.map(h => `
+        <div class="host-card" onclick="goToHost('${h.name}')">
+          <div class="host-card-header">
+            <div class="host-title-wrapper">
+              <i class="fa-solid fa-server host-icon"></i>
+              <div class="host-name">${h.display_name}</div>
+            </div>
+            <div class="host-status ${h.online ? 'online' : 'offline'}"
+                 title="${h.online ? 'Online' : 'Offline'}"></div>
+          </div>
+          <div class="host-stats">
+            <div class="host-stat">
+              <div class="host-stat-label">
+                <i class="fa-solid fa-arrow-down" style="color:var(--rx)"></i> Recebido
+              </div>
+              <div class="host-stat-value rx">${h.rx_total_fmt}</div>
+            </div>
+            <div class="host-stat">
+              <div class="host-stat-label">
+                <i class="fa-solid fa-arrow-up" style="color:var(--tx)"></i> Enviado
+              </div>
+              <div class="host-stat-value tx">${h.tx_total_fmt}</div>
+            </div>
+          </div>
+          <div class="host-card-footer">
+            <span class="host-card-footer-label">Ver detalhes</span>
+            <i class="fa-solid fa-arrow-right host-card-arrow"></i>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function renderTopDays(topDays) {
+      const el = document.getElementById('topDaysContent');
+      if (!topDays || topDays.length === 0) {
+        el.innerHTML = `<div class="empty-msg" style="height:120px;">
+          <i class="fa-solid fa-hourglass-half"></i>
+          <span>Sem dados suficientes ainda</span>
+        </div>`;
+        return;
+      }
+      const max = topDays[0]?.total || 1;
+      el.innerHTML = `
+        <table class="top-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Dia</th>
+              <th>Host</th>
+              <th></th>
+              <th style="text-align:right">Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${topDays.slice(0, 7).map((d, i) => `
+              <tr>
+                <td class="top-rank">${i + 1}</td>
+                <td>${d.date}</td>
+                <td style="color:var(--muted);font-size:11px;">${d.host || '—'}</td>
+                <td style="width:80px;">
+                  <div class="bar-bg">
+                    <div class="bar-fill" style="width:${Math.round((d.total / max) * 100)}%"></div>
+                  </div>
+                </td>
+                <td class="top-total">${formatBytes(d.total)}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      `;
+    }
+
+    function renderMonthBreakdown(hosts) {
+      const el = document.getElementById('monthBreakdownContent');
+      if (!hosts || hosts.length === 0) {
+        el.innerHTML = `<div class="empty-msg" style="height:120px;"><i class="fa-solid fa-hourglass-half"></i></div>`;
+        return;
+      }
+      const totals = hosts.map(h => ({
+        name: h.display_name,
+        rx: h.month_rx || 0,
+        tx: h.month_tx || 0,
+        total: (h.month_rx || 0) + (h.month_tx || 0),
+      })).sort((a, b) => b.total - a.total);
+      const max = totals[0]?.total || 1;
+
+      el.innerHTML = `
+        <table class="top-table">
+          <thead>
+            <tr>
+              <th>Host</th>
+              <th style="color:var(--rx)">Down</th>
+              <th style="color:var(--tx)">Up</th>
+              <th></th>
+              <th style="text-align:right">Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${totals.map(h => `
+              <tr>
+                <td style="font-weight:600;color:var(--text);">${h.name}</td>
+                <td style="color:var(--rx)">${formatBytes(h.rx)}</td>
+                <td style="color:var(--tx)">${formatBytes(h.tx)}</td>
+                <td style="width:60px;">
+                  <div class="bar-bg">
+                    <div class="bar-fill" style="width:${Math.round((h.total / max) * 100)}%"></div>
+                  </div>
+                </td>
+                <td class="top-total">${formatBytes(h.total)}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      `;
+    }
+
+    // ── Charts ───────────────────────────────────────────────────────────
+    const baseOpts = () => ({
+      responsive: true,
+      maintainAspectRatio: true,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: {
+          labels: {
+            color: '#94a3b8',
+            font: { ...CHART_FONTS, size: 11 },
+            padding: 14,
+            usePointStyle: true,
+            pointStyleWidth: 8,
+          }
+        },
+        tooltip: {
+          backgroundColor: '#0d1117',
+          borderColor: '#1e293b',
+          borderWidth: 1,
+          titleFont: { ...CHART_FONTS, size: 12 },
+          bodyFont: { ...CHART_FONTS, size: 11 },
+          padding: 10,
+          callbacks: { label: ctx => ' ' + ctx.dataset.label + ': ' + formatBytes(ctx.parsed.y) },
+        },
+      },
+      scales: {
+        x: {
+          grid: { color: 'rgba(30,41,59,0.5)' },
+          ticks: { color: '#475569', maxTicksLimit: 10, font: { ...CHART_FONTS, size: 10 } }
+        },
+        y: {
+          grid: { color: 'rgba(30,41,59,0.5)' },
+          ticks: { color: '#475569', font: { ...CHART_FONTS, size: 10 }, callback: v => formatBytes(v) }
+        },
+      },
+    });
 
     async function loadCharts() {
       try {
-        const [daily, monthly] = await Promise.all([
+        const [daily, monthly, hourly] = await Promise.all([
           apiFetch('/api/chart/daily?days=30'),
           apiFetch('/api/chart/monthly'),
+          apiFetch('/api/chart/hourly').catch(() => null),
         ]);
 
-        const baseOpts = (type) => ({
-          responsive: true,
-          maintainAspectRatio: true,
-          interaction: { mode: 'index', intersect: false },
-          plugins: {
-            legend: { labels: { color: '#cbd5e1', font: { family: 'IBM Plex Mono, monospace', size: 11 }, padding: 16, usePointStyle: true } },
-            tooltip: {
-              backgroundColor: '#0f172a', borderColor: '#38bdf8', borderWidth: 1,
-              titleFont: { family: 'IBM Plex Mono, monospace', size: 12 },
-              bodyFont: { family: 'IBM Plex Mono, monospace', size: 11 },
-              callbacks: { label: ctx => ctx.dataset.label + ': ' + formatBytes(ctx.parsed.y) },
-            },
-          },
-          scales: {
-            x: { grid: { color: '#1e293b' }, ticks: { color: '#64748b', maxTicksLimit: 10, font: { family: 'IBM Plex Mono, monospace', size: 10 } } },
-            y: { grid: { color: '#1e293b' }, ticks: { color: '#64748b', font: { family: 'IBM Plex Mono, monospace', size: 10 }, callback: v => formatBytes(v) } },
-          },
-        });
-
-        // ── Daily chart ──────────────────────────────────────────────────
+        // Daily
         if (!daily.labels || daily.labels.length === 0) {
-          showEmptyChart('dailyChart', 'Aguardando dados (próximos ciclos do coletor)');
+          document.getElementById('dailyChart').style.display = 'none';
+          document.getElementById('dailyChartEmpty').style.display = 'flex';
         } else {
-          const dailyCtx = document.getElementById('dailyChart').getContext('2d');
+          document.getElementById('dailyChart').style.display = '';
+          document.getElementById('dailyChartEmpty').style.display = 'none';
+          const ctx = document.getElementById('dailyChart').getContext('2d');
           if (dailyChartInstance) dailyChartInstance.destroy();
-
-          const RX_COLORS = ['#38bdf8', '#34d399', '#a78bfa'];
-          const TX_COLORS = ['#f472b6', '#fb923c', '#facc15'];
-
           const hostNames = [...new Set(daily.datasets.map(d => d.host))];
-          const cleanDatasets = [];
-
+          const datasets = [];
           hostNames.forEach((host, i) => {
-            const rxDs = daily.datasets.find(d => d.host === host && d.type === 'rx');
-            const txDs = daily.datasets.find(d => d.host === host && d.type === 'tx');
-
-            if (rxDs) cleanDatasets.push({
-              label: rxDs.label,
-              data: rxDs.data.map(Number),
-              backgroundColor: RX_COLORS[i % RX_COLORS.length] + 'cc',
-              borderColor: RX_COLORS[i % RX_COLORS.length],
-              borderRadius: 3, borderWidth: 1,
-            });
-            if (txDs) cleanDatasets.push({
-              label: txDs.label,
-              data: txDs.data.map(Number),
-              backgroundColor: TX_COLORS[i % TX_COLORS.length] + 'cc',
-              borderColor: TX_COLORS[i % TX_COLORS.length],
-              borderRadius: 3, borderWidth: 1,
-            });
+            const rx = daily.datasets.find(d => d.host === host && d.type === 'rx');
+            const tx = daily.datasets.find(d => d.host === host && d.type === 'tx');
+            if (rx) datasets.push({ label: rx.label, data: rx.data.map(Number), backgroundColor: RX_COLORS[i % 3] + 'bb', borderColor: RX_COLORS[i % 3], borderRadius: 3, borderWidth: 1 });
+            if (tx) datasets.push({ label: tx.label, data: tx.data.map(Number), backgroundColor: TX_COLORS[i % 3] + 'bb', borderColor: TX_COLORS[i % 3], borderRadius: 3, borderWidth: 1 });
           });
-
-          dailyChartInstance = new Chart(dailyCtx, {
-            type: 'bar',
-            data: { labels: daily.labels, datasets: cleanDatasets },
-            options: baseOpts('bar'),
-          });
+          dailyChartInstance = new Chart(ctx, { type: 'bar', data: { labels: daily.labels, datasets }, options: baseOpts() });
         }
 
-        // ── Monthly chart ────────────────────────────────────────────────
+        // Monthly
         if (!monthly.labels || monthly.labels.length === 0) {
-          showEmptyChart('monthlyChart', 'Aguardando dados mensais');
+          document.getElementById('monthlyChart').style.display = 'none';
+          document.getElementById('monthlyChartEmpty').style.display = 'flex';
         } else {
-          const monthlyCtx = document.getElementById('monthlyChart').getContext('2d');
+          document.getElementById('monthlyChart').style.display = '';
+          document.getElementById('monthlyChartEmpty').style.display = 'none';
+          const ctx = document.getElementById('monthlyChart').getContext('2d');
           if (monthlyChartInstance) monthlyChartInstance.destroy();
-
-          const M_COLORS = ['#38bdf8', '#34d399', '#a78bfa'];
-          const cleanMonthly = [];
-
+          const datasets = [];
           monthly.datasets.forEach((ds, i) => {
-            const c = M_COLORS[i % M_COLORS.length];
-            cleanMonthly.push({
-              label: ds.label + ' ↓',
-              data: (ds.rx || []).map(Number),
-              borderColor: c, backgroundColor: c + '33',
-              borderWidth: 2, tension: 0.4, fill: true,
-              pointRadius: 4, pointHoverRadius: 6,
-            });
-            cleanMonthly.push({
-              label: ds.label + ' ↑',
-              data: (ds.tx || []).map(Number),
-              borderColor: c + 'aa', backgroundColor: 'transparent',
-              borderWidth: 1.5, tension: 0.4, fill: false, borderDash: [4, 3],
-              pointRadius: 3, pointHoverRadius: 5,
-            });
+            const c = RX_COLORS[i % 3];
+            datasets.push({ label: ds.label + ' ↓', data: (ds.rx || []).map(Number), borderColor: c, backgroundColor: c + '22', borderWidth: 2, tension: 0.4, fill: true, pointRadius: 3, pointHoverRadius: 5 });
+            datasets.push({ label: ds.label + ' ↑', data: (ds.tx || []).map(Number), borderColor: c + '88', backgroundColor: 'transparent', borderWidth: 1.5, tension: 0.4, fill: false, borderDash: [4, 3], pointRadius: 2, pointHoverRadius: 4 });
           });
-
-          monthlyChartInstance = new Chart(monthlyCtx, {
-            type: 'line',
-            data: { labels: monthly.labels, datasets: cleanMonthly },
-            options: baseOpts('line'),
-          });
+          monthlyChartInstance = new Chart(ctx, { type: 'line', data: { labels: monthly.labels, datasets }, options: baseOpts() });
         }
+
+        // Hourly (last 7 days)
+        if (hourly && hourly.labels && hourly.labels.length > 0) {
+          document.getElementById('hourlyChart').style.display = '';
+          document.getElementById('hourlyEmpty').style.display = 'none';
+          const ctx = document.getElementById('hourlyChart').getContext('2d');
+          if (hourlyChartInstance) hourlyChartInstance.destroy();
+          const opts = baseOpts();
+          opts.plugins.legend.display = false;
+          hourlyChartInstance = new Chart(ctx, {
+            type: 'line',
+            data: {
+              labels: hourly.labels,
+              datasets: [{
+                label: 'RX',
+                data: (hourly.rx || []).map(Number),
+                borderColor: '#38bdf8',
+                backgroundColor: 'rgba(56,189,248,0.08)',
+                borderWidth: 1.5,
+                tension: 0.4,
+                fill: true,
+                pointRadius: 0,
+              }, {
+                label: 'TX',
+                data: (hourly.tx || []).map(Number),
+                borderColor: '#f472b6',
+                backgroundColor: 'transparent',
+                borderWidth: 1.5,
+                tension: 0.4,
+                fill: false,
+                pointRadius: 0,
+              }]
+            },
+            options: opts,
+          });
+        } else {
+          document.getElementById('hourlyChart').style.display = 'none';
+          document.getElementById('hourlyEmpty').style.display = 'flex';
+        }
+
       } catch (err) {
-        console.error('[charts] ERRO:', err);
+        console.error('[charts]', err);
       }
     }
 
-    function showEmptyChart(canvasId, msg) {
-      const canvas = document.getElementById(canvasId);
-      const parent = canvas.parentElement;
-      canvas.style.display = 'none';
-      if (!parent.querySelector('.empty-msg')) {
-        const el = document.createElement('div');
-        el.className = 'empty-msg';
-        el.style.cssText = 'display:flex;align-items:center;justify-content:center;height:200px;color:#64748b;font-family:var(--mono);font-size:13px;gap:8px;';
-        el.innerHTML = `<i class="fa-solid fa-circle-exclamation"></i> ${msg}`;
-        parent.appendChild(el);
-      }
+    // ── Helpers ──────────────────────────────────────────────────────────
+    async function apiFetch(url) {
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
+      return res.json();
     }
 
     function formatBytes(bytes) {
-      if (!bytes) return '0 B';
+      if (!bytes || bytes === 0) return '0 B';
       const k = 1024;
       const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
       const i = Math.floor(Math.log(bytes) / Math.log(k));
-      return (bytes / Math.pow(k, i)).toFixed(1) + ' ' + sizes[i];
+      return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
     }
 
     function goToHost(name) {
       window.location.href = `/host/${name}`;
-    }
-
-    async function doLogout() {
-      try {
-        await fetch('/api/auth/logout', { method: 'POST' });
-      } finally {
-        window.location.href = '/login';
-      }
     }
   </script>
 </body>
