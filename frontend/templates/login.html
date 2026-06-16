@@ -4,11 +4,22 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0a0e14" />
+
+  <!-- Pré-conexões para otimização -->
+  <link rel="preconnect" href="/" />
+  <link rel="dns-prefetch" href="/" />
+
+  <!-- SEO e segurança -->
+  <meta name="robots" content="noindex, nofollow" />
+
   <title>VnStat — Login</title>
-  <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=1">
-  <link rel="stylesheet" href="/static/css/all.min.css">
-  <link rel="stylesheet" href="/static/css/fonts.css">
-  <script src="/static/js/chart.umd.min.js"></script>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=1" />
+  <link rel="stylesheet" href="/static/css/all.min.css" />
+  <link rel="stylesheet" href="/static/css/fonts.css" />
+
+  <!-- Removido: Chart.js não é necessário nesta página -->
+  <!-- Carregamento otimizado se necessário futuramente -->
 
   <style>
     *,
@@ -273,8 +284,8 @@
 </head>
 
 <body>
-  <div class="card">
-    <div class="logo">
+  <div class="card" role="main" aria-labelledby="pageTitle">
+    <div class="logo" aria-hidden="true">
       <div class="logo-icon">
         <svg viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2" stroke-linecap="round">
           <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
@@ -283,40 +294,57 @@
       <div class="logo-text">vn<span>dash</span></div>
     </div>
 
-    <h1>Acesso ao painel</h1>
+    <h1 id="pageTitle">Acesso ao painel</h1>
     <p class="subtitle" id="formSubtitle">Monitoramento de tráfego de rede</p>
 
-    <div id="stepCredentials" class="field-group">
-      <div class="field">
-        <label><i class="fa-solid fa-user"></i> Usuário</label>
-        <input type="text" id="username" autocomplete="username" placeholder="admin" autofocus />
+    <form id="loginForm" onsubmit="handleSubmit(); return false;" novalidate>
+      <div id="stepCredentials" class="field-group">
+        <div class="field">
+          <label for="username">
+            <i class="fa-solid fa-user" aria-hidden="true"></i>
+            <span>Usuário</span>
+          </label>
+          <input type="text" id="username" name="username" autocomplete="username" placeholder="admin" autofocus
+            required aria-required="true" aria-describedby="usernameHelp" />
+        </div>
+
+        <div class="field">
+          <label for="password">
+            <i class="fa-solid fa-lock" aria-hidden="true"></i>
+            <span>Senha</span>
+          </label>
+          <input type="password" id="password" name="password" autocomplete="current-password" placeholder="••••••••"
+            required aria-required="true" />
+        </div>
       </div>
 
-      <div class="field">
-        <label><i class="fa-solid fa-lock"></i> Senha</label>
-        <input type="password" id="password" autocomplete="current-password" placeholder="••••••••" />
+      <div id="step2FA" class="field-group hidden">
+        <div class="field">
+          <label for="token2fa">
+            <i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
+            <span>Código de Segurança (2FA)</span>
+          </label>
+          <input type="text" id="token2fa" name="token2fa" inputmode="numeric" pattern="[0-9]*" maxlength="6"
+            placeholder="000000" autocomplete="one-time-code" required aria-required="true"
+            aria-describedby="token2faHelp" />
+        </div>
       </div>
-    </div>
 
-    <div id="step2FA" class="field-group hidden">
-      <div class="field">
-        <label><i class="fa-solid fa-shield-halved"></i> Código de Segurança (2FA)</label>
-        <input type="text" id="token2fa" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="000000"
-          autocomplete="one-time-code" />
-      </div>
-    </div>
+      <button class="btn" id="loginBtn" type="submit">
+        <div class="spinner" aria-hidden="true"></div>
+        <span class="btn-text" id="btnText">Entrar</span>
+      </button>
+    </form>
 
-    <button class="btn" id="loginBtn" onclick="handleSubmit()">
-      <div class="spinner"></div>
-      <span class="btn-text" id="btnText">Entrar</span>
-    </button>
-
-    <div class="error-msg" id="errorMsg"></div>
+    <div class="error-msg" id="errorMsg" role="alert" aria-live="assertive"></div>
 
     <p class="footer">vnstat-dashboard v1.0</p>
   </div>
 
   <script>
+    // ════════════════════════════════════════════════════════════════════
+    // STATE
+    // ════════════════════════════════════════════════════════════════════
     const usernameEl = document.getElementById('username');
     const passwordEl = document.getElementById('password');
     const token2faEl = document.getElementById('token2fa');
@@ -330,12 +358,26 @@
 
     let requires2FA = false;
 
+    // ════════════════════════════════════════════════════════════════════
+    // INIT
+    // ════════════════════════════════════════════════════════════════════
+    document.addEventListener('DOMContentLoaded', () => {
+      usernameEl.focus();
+    });
+
+    // ════════════════════════════════════════════════════════════════════
+    // EVENT HANDLERS
+    // ════════════════════════════════════════════════════════════════════
     // Escuta teclas Enter em todos os inputs relevantes
     [usernameEl, passwordEl, token2faEl].forEach(el =>
-      el.addEventListener('keydown', e => { if (e.key === 'Enter') handleSubmit(); })
+      el.addEventListener('keydown', e => {
+        if (e.key === 'Enter') handleSubmit();
+      })
     );
 
-    // Gerencia o envio com base no estado do fluxo (senha ou token)
+    // ════════════════════════════════════════════════════════════════════
+    // SUBMIT HANDLER
+    // ════════════════════════════════════════════════════════════════════
     function handleSubmit() {
       if (!requires2FA) {
         doLoginStage1();
@@ -344,7 +386,9 @@
       }
     }
 
-    // Validação inicial do usuário/senha
+    // ════════════════════════════════════════════════════════════════════
+    // LOGIN STAGE 1 (usuário/senha)
+    // ════════════════════════════════════════════════════════════════════
     async function doLoginStage1() {
       clearError();
       setLoading(true);
@@ -384,9 +428,12 @@
       }
     }
 
-    // Validação do Token TOTP
+    // ════════════════════════════════════════════════════════════════════
+    // LOGIN STAGE 2 (validação TOTP)
+    // ════════════════════════════════════════════════════════════════════
     async function doLoginStage2() {
       clearError();
+
       if (token2faEl.value.trim().length !== 6) {
         showError("O código deve conter 6 dígitos.");
         return;
@@ -417,6 +464,9 @@
       }
     }
 
+    // ════════════════════════════════════════════════════════════════════
+    // UI HELPERS
+    // ════════════════════════════════════════════════════════════════════
     function setLoading(isLoading) {
       loginBtn.disabled = isLoading;
       if (isLoading) {
@@ -427,7 +477,7 @@
     }
 
     function showError(msg) {
-      errorMsg.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> ${msg}`;
+      errorMsg.innerHTML = `<i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> ${msg}`;
       errorMsg.classList.add('show');
     }
 
