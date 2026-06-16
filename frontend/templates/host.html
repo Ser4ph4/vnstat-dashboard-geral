@@ -4,100 +4,129 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0d1117" />
+
+  <!-- Pré-conexões para otimização -->
+  <link rel="preconnect" href="/" />
+  <link rel="dns-prefetch" href="/" />
+
   <title>VnStat — Dashboard</title>
-  <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=1">
-  <link rel="stylesheet" href="/static/css/all.min.css">
-  <link rel="stylesheet" href="/static/css/fonts.css">
-  <link rel="stylesheet" href="/static/css/style.css">
-  <script src="/static/js/chart.umd.min.js"></script>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=1" />
+  <link rel="stylesheet" href="/static/css/all.min.css" />
+  <link rel="stylesheet" href="/static/css/fonts.css" />
+  <link rel="stylesheet" href="/static/css/style.css" />
 
-  <style>
-
-  </style>
+  <!-- Carregamento otimizado do Chart.js -->
+  <script src="/static/js/chart.umd.min.js" defer></script>
 </head>
 
 <body>
-  <header>
+  <header role="banner">
     <div class="header-left">
-      <button class="btn-back" onclick="window.history.back()">
-        <i class="fa-solid fa-arrow-left"></i> Voltar
+      <button class="btn-back" onclick="window.history.back()" aria-label="Voltar para página anterior">
+        <i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Voltar
       </button>
-      <div class="host-title" id="hostTitle">
-        <i class="fa-solid fa-server"></i> —
+      <div class="host-title" id="hostTitle" aria-live="polite">
+        <i class="fa-solid fa-server" aria-hidden="true"></i> —
       </div>
     </div>
   </header>
 
-  <main>
-    <nav class="tab-nav">
-      <button class="tab-btn active" onclick="switchTab('overview', this)">
-        <i class="fa-solid fa-gauge-high"></i> Visão Geral
+  <main role="main">
+    <nav class="tab-nav" role="tablist" aria-label="Navegação de tabs">
+      <button class="tab-btn active" onclick="switchTab('overview', this)" role="tab" aria-selected="true"
+        aria-controls="tab-overview" id="tab-overview-btn">
+        <i class="fa-solid fa-gauge-high" aria-hidden="true"></i>
+        <span>Visão Geral</span>
       </button>
-      <button class="tab-btn" onclick="switchTab('analysis', this)">
-        <i class="fa-solid fa-magnifying-glass-chart"></i> Análise
+      <button class="tab-btn" onclick="switchTab('analysis', this)" role="tab" aria-selected="false"
+        aria-controls="tab-analysis" tabindex="-1" id="tab-analysis-btn">
+        <i class="fa-solid fa-magnifying-glass-chart" aria-hidden="true"></i>
+        <span>Análise</span>
       </button>
     </nav>
 
-    <div class="tab-panel active" id="tab-overview">
+    <!-- Tab: Visão Geral -->
+    <div class="tab-panel active" id="tab-overview" role="tabpanel" aria-labelledby="tab-overview-btn">
 
-      <div class="section-title"><i class="fa-solid fa-gauge-high"></i> Estatísticas Atuais</div>
-      <div class="kpi-grid" id="kpiGrid">
-        <div class="loading">
-          <div class="spinner"></div> Carregando...
+      <div class="section-title">
+        <i class="fa-solid fa-gauge-high" aria-hidden="true"></i>
+        <span>Estatísticas Atuais</span>
+      </div>
+      <div class="kpi-grid" id="kpiGrid" aria-label="Métricas principais do host">
+        <div class="loading" role="status">
+          <div class="spinner"></div>
+          <span>Carregando...</span>
         </div>
       </div>
 
-      <div class="section-title"><i class="fa-solid fa-calendar-day"></i> Últimos 30 dias</div>
+      <div class="section-title">
+        <i class="fa-solid fa-calendar-day" aria-hidden="true"></i>
+        <span>Últimos 30 dias</span>
+      </div>
       <div class="chart-card" style="margin-bottom:24px;">
         <div class="chart-header">
-          <i class="fa-solid fa-chart-bar"></i>
+          <i class="fa-solid fa-chart-bar" aria-hidden="true"></i>
           <div class="chart-title">Tráfego Diário</div>
         </div>
-        <canvas id="dailyChart"></canvas>
+        <canvas id="dailyChart" role="img" aria-label="Gráfico de tráfego diário dos últimos 30 dias"></canvas>
       </div>
 
-      <div class="section-title"><i class="fa-solid fa-calendar-days"></i> Últimos 12 meses</div>
+      <div class="section-title">
+        <i class="fa-solid fa-calendar-days" aria-hidden="true"></i>
+        <span>Últimos 12 meses</span>
+      </div>
       <div class="chart-card">
         <div class="chart-header">
-          <i class="fa-solid fa-chart-line"></i>
+          <i class="fa-solid fa-chart-line" aria-hidden="true"></i>
           <div class="chart-title">Tráfego Mensal</div>
         </div>
-        <canvas id="monthlyChart"></canvas>
+        <canvas id="monthlyChart" role="img" aria-label="Gráfico de tráfego mensal dos últimos 12 meses"></canvas>
       </div>
 
     </div>
-    <div class="tab-panel" id="tab-analysis">
 
-      <div class="section-title"><i class="fa-solid fa-sliders"></i> Indicadores</div>
-      <div class="analysis-kpi-grid" id="analysisKpis">
-        <div class="loading">
-          <div class="spinner"></div> Carregando...
+    <!-- Tab: Análise -->
+    <div class="tab-panel" id="tab-analysis" role="tabpanel" aria-labelledby="tab-analysis-btn" tabindex="-1">
+
+      <div class="section-title">
+        <i class="fa-solid fa-sliders" aria-hidden="true"></i>
+        <span>Indicadores</span>
+      </div>
+      <div class="analysis-kpi-grid" id="analysisKpis" aria-label="Indicadores de análise">
+        <div class="loading" role="status">
+          <div class="spinner"></div>
+          <span>Carregando...</span>
         </div>
       </div>
 
-      <div class="section-title"><i class="fa-solid fa-calendar-days"></i> Distribuição de Tráfego Mensal</div>
+      <div class="section-title">
+        <i class="fa-solid fa-calendar-days" aria-hidden="true"></i>
+        <span>Distribuição de Tráfego Mensal</span>
+      </div>
       <div class="chart-card" style="margin-bottom:20px;">
         <div class="chart-header">
           <div class="chart-header-left">
-            <i class="fa-solid fa-circle-dot" style="color:var(--accent);font-size:10px;"></i>
+            <i class="fa-solid fa-circle-dot" style="color:var(--accent);font-size:10px;" aria-hidden="true"></i>
             <span class="chart-title" style="font-size:13px;">Intensidade de Tráfego Diário (Últimos 30 dias)</span>
           </div>
           <span class="chart-badge" id="heatmapLegendLabel">RX + TX</span>
         </div>
 
-        <div class="heatmap-container">
+        <div class="heatmap-container" role="img" aria-label="Heatmap de tráfego diário">
           <div class="heatmap-header-days">
             <span>Dom</span><span>Seg</span><span>Ter</span><span>Qua</span><span>Qui</span><span>Sex</span><span>Sáb</span>
           </div>
-          <div class="heatmap-grid" id="heatmapGrid">
-            <div class="loading">
-              <div class="spinner"></div> Carregando...
+          <div class="heatmap-grid" id="heatmapGrid" aria-label="Grid do heatmap">
+            <div class="loading" role="status">
+              <div class="spinner"></div>
+              <span>Carregando...</span>
             </div>
           </div>
-          <div class="heatmap-legend">
-            Menos
+          <div class="heatmap-legend" aria-label="Legenda de intensidade">
+            <span>Menos</span>
             <div class="heatmap-legend-cells" id="heatmapLegendCells"></div>
-            Mais
+            <span>Mais</span>
           </div>
         </div>
       </div>
@@ -106,42 +135,48 @@
         <div class="chart-card">
           <div class="chart-header">
             <div class="chart-header-left">
-              <i class="fa-solid fa-chart-line" style="color:var(--muted);font-size:13px;"></i>
+              <i class="fa-solid fa-chart-line" style="color:var(--muted);font-size:13px;" aria-hidden="true"></i>
               <span class="chart-title" style="font-size:13px;">Tendência Diária</span>
             </div>
             <span class="chart-badge">Média 7d</span>
           </div>
-          <canvas id="trendChart" style="max-height:240px;"></canvas>
+          <canvas id="trendChart" style="max-height:240px;" role="img"
+            aria-label="Gráfico de tendência diária com média móvel de 7 dias"></canvas>
         </div>
         <div class="chart-card">
           <div class="chart-header">
             <div class="chart-header-left">
-              <i class="fa-solid fa-chart-pie" style="color:var(--muted);font-size:13px;"></i>
+              <i class="fa-solid fa-chart-pie" style="color:var(--muted);font-size:13px;" aria-hidden="true"></i>
               <span class="chart-title" style="font-size:13px;">Proporção RX / TX</span>
             </div>
           </div>
-          <canvas id="ratioChart" style="max-height:240px;"></canvas>
+          <canvas id="ratioChart" style="max-height:240px;" role="img"
+            aria-label="Gráfico de proporção entre recebido e enviado"></canvas>
         </div>
       </div>
 
-      <div class="section-title"><i class="fa-solid fa-ranking-star"></i> Top 10 — Dias com Mais Tráfego</div>
+      <div class="section-title">
+        <i class="fa-solid fa-ranking-star" aria-hidden="true"></i>
+        <span>Top 10 — Dias com Mais Tráfego</span>
+      </div>
       <div class="chart-card">
-        <table class="top-table" id="topDaysTable">
+        <table class="top-table" id="topDaysTable" aria-label="Ranking dos 10 dias com maior tráfego">
           <thead>
             <tr>
-              <th>#</th>
-              <th>Data</th>
-              <th style="width:40%;">Volume</th>
-              <th>RX</th>
-              <th>TX</th>
-              <th style="text-align:right;">Total</th>
+              <th scope="col">#</th>
+              <th scope="col">Data</th>
+              <th scope="col" style="width:40%;">Volume</th>
+              <th scope="col">RX</th>
+              <th scope="col">TX</th>
+              <th scope="col" style="text-align:right;">Total</th>
             </tr>
           </thead>
           <tbody id="topDaysTbody">
             <tr>
               <td colspan="6">
-                <div class="loading">
-                  <div class="spinner"></div> Carregando...
+                <div class="loading" role="status">
+                  <div class="spinner"></div>
+                  <span>Carregando...</span>
                 </div>
               </td>
             </tr>
@@ -153,36 +188,48 @@
   </main>
 
   <script>
+    // ════════════════════════════════════════════════════════════════════
+    // STATE
+    // ════════════════════════════════════════════════════════════════════
     const hostName = new URLSearchParams(window.location.search).get('h') ||
       window.location.pathname.split('/').pop();
     let chartsInstances = {};
 
+    // ════════════════════════════════════════════════════════════════════
+    // INIT
+    // ════════════════════════════════════════════════════════════════════
     document.addEventListener('DOMContentLoaded', () => {
       loadHostDetail();
       setInterval(loadHostDetail, 30000);
     });
 
+    // ════════════════════════════════════════════════════════════════════
+    // LOAD HOST DETAIL
+    // ════════════════════════════════════════════════════════════════════
     async function loadHostDetail() {
       try {
         const res = await fetch(`/api/host/${hostName}`);
         const data = await res.json();
 
-        document.getElementById('hostTitle').innerHTML = `<i class="fa-solid fa-server"></i> ${data.host.display_name}`;
+        document.getElementById('hostTitle').innerHTML =
+          `<i class="fa-solid fa-server" aria-hidden="true"></i> ${data.host.display_name}`;
 
-        // ── KPIs Visão Geral ─────────────────────────────────────────────
+        // ══════════════════════════════════════════════════════════════
+        // ── KPIs Visão Geral
+        // ══════════════════════════════════════════════════════════════
         const c = data.current || {};
         document.getElementById('kpiGrid').innerHTML = `
           <div class="kpi-card">
             <div class="kpi-header">
               <div class="kpi-label">Total Recebido</div>
-              <i class="fa-solid fa-cloud-arrow-down kpi-icon"></i>
+              <i class="fa-solid fa-cloud-arrow-down kpi-icon" aria-hidden="true"></i>
             </div>
             <div class="kpi-value rx">${c.rx_total_fmt || '—'}</div>
           </div>
           <div class="kpi-card">
             <div class="kpi-header">
               <div class="kpi-label">Total Enviado</div>
-              <i class="fa-solid fa-cloud-arrow-up kpi-icon"></i>
+              <i class="fa-solid fa-cloud-arrow-up kpi-icon" aria-hidden="true"></i>
             </div>
             <div class="kpi-value tx">${c.tx_total_fmt || '—'}</div>
           </div>
@@ -192,7 +239,14 @@
           responsive: true,
           maintainAspectRatio: true,
           plugins: {
-            legend: { labels: { color: '#cbd5e1', font: { family: "IBM Plex Mono, monospace", size: 11 }, padding: 16, usePointStyle: true } },
+            legend: {
+              labels: {
+                color: '#cbd5e1',
+                font: { family: "IBM Plex Mono, monospace", size: 11 },
+                padding: 16,
+                usePointStyle: true
+              }
+            },
             tooltip: {
               backgroundColor: '#0f172a',
               borderColor: '#38bdf8',
@@ -203,15 +257,27 @@
             },
           },
           scales: {
-            x: { grid: { color: '#1e293b' }, ticks: { color: '#64748b', font: { family: "IBM Plex Mono, monospace", size: 10 } } },
+            x: {
+              grid: { color: '#1e293b' },
+              ticks: {
+                color: '#64748b',
+                font: { family: "IBM Plex Mono, monospace", size: 10 }
+              }
+            },
             y: {
               grid: { color: '#1e293b' },
-              ticks: { color: '#64748b', font: { family: "IBM Plex Mono, monospace", size: 10 }, callback: v => formatBytes(v) },
+              ticks: {
+                color: '#64748b',
+                font: { family: "IBM Plex Mono, monospace", size: 10 },
+                callback: v => formatBytes(v)
+              },
             },
           },
         };
 
-        // ── Gráfico Diário ───────────────────────────────────────────────
+        // ══════════════════════════════════════════════════════════════
+        // ── Gráfico Diário
+        // ══════════════════════════════════════════════════════════════
         const dailyCtx = document.getElementById('dailyChart').getContext('2d');
         if (chartsInstances.daily) chartsInstances.daily.destroy();
         chartsInstances.daily = new Chart(dailyCtx, {
@@ -243,7 +309,9 @@
           },
         });
 
-        // ── Gráfico Mensal ───────────────────────────────────────────────
+        // ══════════════════════════════════════════════════════════════
+        // ── Gráfico Mensal
+        // ══════════════════════════════════════════════════════════════
         const monthlyCtx = document.getElementById('monthlyChart').getContext('2d');
         if (chartsInstances.monthly) chartsInstances.monthly.destroy();
         chartsInstances.monthly = new Chart(monthlyCtx, {
@@ -289,11 +357,17 @@
 
         // 1. Indicadores Básicos
         document.getElementById('analysisKpis').innerHTML = `
-          <div class="kpi-card"><div class="kpi-label">Média Diária</div><div class="kpi-value" style="color:var(--accent)">${formatBytes((totalRx + totalTx) / (data.days.length || 1))}</div></div>
-          <div class="kpi-card"><div class="kpi-label">Dias Monitorados</div><div class="kpi-value">${data.days.length} dias</div></div>
+          <div class="kpi-card">
+            <div class="kpi-label">Média Diária</div>
+            <div class="kpi-value" style="color:var(--accent)">${formatBytes((totalRx + totalTx) / (data.days.length || 1))}</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">Dias Monitorados</div>
+            <div class="kpi-value">${data.days.length} dias</div>
+          </div>
         `;
 
-        // 2. CORREÇÃO GARANTIDA DO TOP 10 (Gera o ranking local se a chave da API faltar)
+        // 2. CORREÇÃO GARANTIDA DO TOP 10
         const sortedDays = data.top_days || data.top || [...data.days].sort((a, b) => (Number(b.rx) + Number(b.tx)) - (Number(a.rx) + Number(a.tx)));
         if (sortedDays && sortedDays.length > 0) {
           const maxTotal = Math.max(...sortedDays.map(d => (Number(d.rx) + Number(d.tx))), 1);
@@ -336,8 +410,16 @@
             responsive: true,
             maintainAspectRatio: true,
             plugins: {
-              legend: { labels: { color: '#cbd5e1', font: { family: "IBM Plex Mono, monospace", size: 11 }, usePointStyle: true } },
-              tooltip: { callbacks: { label: ctx => ` ${ctx.label}: ${formatBytes(ctx.raw)}` } }
+              legend: {
+                labels: {
+                  color: '#cbd5e1',
+                  font: { family: "IBM Plex Mono, monospace", size: 11 },
+                  usePointStyle: true
+                }
+              },
+              tooltip: {
+                callbacks: { label: ctx => ` ${ctx.label}: ${formatBytes(ctx.raw)}` }
+              }
             }
           }
         });
@@ -358,20 +440,35 @@
           data: {
             labels: data.days.map(d => d.date),
             datasets: [
-              { label: 'Volume Diário', data: dailyTotals, borderColor: 'rgba(56, 189, 248, 0.15)', backgroundColor: 'transparent', borderWidth: 1, pointRadius: 0 },
-              { label: 'Tendência (Média 7d)', data: movingAverages, borderColor: '#818cf8', backgroundColor: 'transparent', borderWidth: 2, tension: 0.3, pointRadius: 2, pointBackgroundColor: '#818cf8' }
+              {
+                label: 'Volume Diário',
+                data: dailyTotals,
+                borderColor: 'rgba(56, 189, 248, 0.15)',
+                backgroundColor: 'transparent',
+                borderWidth: 1,
+                pointRadius: 0
+              },
+              {
+                label: 'Tendência (Média 7d)',
+                data: movingAverages,
+                borderColor: '#818cf8',
+                backgroundColor: 'transparent',
+                borderWidth: 2,
+                tension: 0.3,
+                pointRadius: 2,
+                pointBackgroundColor: '#818cf8'
+              }
             ]
           },
           options: chartBaseOpts
         });
 
-        // 5. CORREÇÃO COMPLETA: Geração do Heatmap em Formato Calendário Sétrico (Estilo Desktop Widget)
+        // 5. CORREÇÃO COMPLETA: Geração do Heatmap
         const firstDateStr = data.days[0]?.date;
         const firstDayOfWeek = firstDateStr ? new Date(firstDateStr + 'T00:00:00').getDay() : 0;
 
         let gridHtml = '';
 
-        // Insere blocos transparentes se o primeiro dia do histórico não for um Domingo
         for (let i = 0; i < firstDayOfWeek; i++) {
           gridHtml += `<div style="background: transparent; border: none; pointer-events: none;"></div>`;
         }
@@ -381,14 +478,12 @@
         gridHtml += data.days.map(d => {
           const total = Number(d.rx) + Number(d.tx);
           const weight = total / maxDayTotal;
-          let bgColor = 'rgba(30, 41, 59, 0.15)'; // Cor para dias vazios/sem tráfego
-          let numColor = 'rgba(226, 232, 240, 0.3)'; // Cor do número apagada por padrão
+          let bgColor = 'rgba(30, 41, 59, 0.15)';
+          let numColor = 'rgba(226, 232, 240, 0.3)';
 
           if (total > 0) {
-            // Calcula opacidade proporcional ao uso
             const alpha = Math.max(0.20, Math.min(weight, 0.90)).toFixed(2);
             bgColor = `rgba(56, 189, 248, ${alpha})`;
-            // Inverte a cor do número para preto se o fundo estiver brilhante demais (acima de 0.55 de opacidade)
             numColor = alpha > 0.55 ? '#0a0e14' : 'var(--text)';
           }
 
@@ -396,7 +491,7 @@
           const tip = `${d.date} • Total: ${formatBytes(total)} (↓${formatBytes(d.rx)} ↑${formatBytes(d.tx)})`;
 
           return `
-            <div class="hm-cell" style="background: ${bgColor}" data-tip="${tip}">
+            <div class="hm-cell" style="background: ${bgColor}" data-tip="${tip}" tabindex="0" role="cell" aria-label="${tip}">
               <span class="hm-cell-num" style="color: ${numColor}">${dayNum}</span>
             </div>
           `;
@@ -404,7 +499,6 @@
 
         document.getElementById('heatmapGrid').innerHTML = gridHtml;
 
-        // Renderiza as cores da legenda de intensidade
         const legendCells = document.getElementById('heatmapLegendCells');
         if (legendCells) {
           legendCells.innerHTML = [0, 0.25, 0.5, 0.75, 1].map(v => {
@@ -418,6 +512,9 @@
       }
     }
 
+    // ════════════════════════════════════════════════════════════════════
+    // HELPERS
+    // ════════════════════════════════════════════════════════════════════
     function formatBytes(bytes) {
       if (!bytes) return '0 B';
       const k = 1024;
@@ -427,13 +524,22 @@
     }
 
     function switchTab(tabId, btnElement) {
+      // Update buttons
       document.querySelectorAll('.tab-nav .tab-btn').forEach(btn => {
         btn.classList.remove('active');
+        btn.setAttribute('aria-selected', 'false');
+        btn.setAttribute('tabindex', '-1');
       });
+
+      // Update panels
       document.querySelectorAll('.tab-panel').forEach(panel => {
         panel.classList.remove('active');
       });
+
+      // Activate selected
       btnElement.classList.add('active');
+      btnElement.setAttribute('aria-selected', 'true');
+      btnElement.setAttribute('tabindex', '0');
       document.getElementById(`tab-${tabId}`).classList.add('active');
     }
   </script>
