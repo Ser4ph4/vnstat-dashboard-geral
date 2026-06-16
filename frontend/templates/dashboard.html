@@ -4,21 +4,29 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0d1117" />
+
+  <!-- Pré-conexões para otimização -->
+  <link rel="preconnect" href="/" />
+  <link rel="dns-prefetch" href="/" />
+
   <title>VnStat — Dashboard</title>
-  <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=1">
-  <link rel="stylesheet" href="/static/css/all.min.css">
-  <link rel="stylesheet" href="/static/css/fonts.css">
-  <link rel="stylesheet" href="/static/css/style.css">
-  <script src="/static/js/chart.umd.min.js"></script>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=1" />
+  <link rel="stylesheet" href="/static/css/all.min.css" />
+  <link rel="stylesheet" href="/static/css/fonts.css" />
+  <link rel="stylesheet" href="/static/css/style.css" />
+
+  <!-- Carregamento otimizado do Chart.js -->
+  <script src="/static/js/chart.umd.min.js" defer></script>
 </head>
 
 <body>
-  <header>
+  <header role="banner">
     <div class="header-left">
-      <a class="header-logo" href="/">
+      <a class="header-logo" href="/" aria-label="VnStat - Voltar ao início">
         <div class="header-logo-icon">
           <svg viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5" stroke-linecap="round"
-            stroke-linejoin="round">
+            stroke-linejoin="round" aria-hidden="true">
             <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
           </svg>
         </div>
@@ -27,95 +35,106 @@
 
       <div class="header-sep"></div>
 
-      <div class="header-status-pill" id="headerStatusPill">
+      <div class="header-status-pill" id="headerStatusPill" role="status" aria-live="polite">
         <div class="header-status-dot" id="headerStatusDot"></div>
         <span id="headerStatusText">—</span>
       </div>
     </div>
 
     <div class="header-right">
-      <button class="btn-refresh" onclick="refreshAll()" title="Atualizar dados">
+      <button class="btn-refresh" onclick="refreshAll()" title="Atualizar dados" aria-label="Atualizar dados">
         <i class="fa-solid fa-rotate-right" id="refreshIcon"></i> Atualizar
       </button>
-      <div class="user-badge" id="userBadge"><i class="fa-solid fa-circle-user"></i> —</div>
-      <button class="btn-logout" onclick="doLogout()">
+      <div class="user-badge" id="userBadge" aria-label="Usuário atual">
+        <i class="fa-solid fa-circle-user"></i> —
+      </div>
+      <button class="btn-logout" onclick="doLogout()" aria-label="Sair do sistema">
         <i class="fa-solid fa-right-from-bracket"></i> Sair
       </button>
     </div>
   </header>
 
-  <main>
-
+  <main role="main">
+    <!-- Section: Agregado Total -->
     <div class="section-header">
       <div class="section-title">
-        <i class="fa-solid fa-chart-pie"></i> Agregado Total
+        <i class="fa-solid fa-chart-pie" aria-hidden="true"></i>
+        <span>Agregado Total</span>
       </div>
-      <div class="section-meta" id="kpiMeta">—</div>
+      <div class="section-meta" id="kpiMeta" aria-live="polite">—</div>
     </div>
-    <div class="kpi-grid" id="kpiGrid">
-      <div class="loading">
-        <div class="spinner"></div> Carregando...
-      </div>
-    </div>
-
-    <div class="section-header" style="margin-top: 36px;">
-      <div class="section-title">
-        <i class="fa-solid fa-network-wired"></i> Hosts
-      </div>
-      <div class="section-meta" id="hostsMeta">—</div>
-    </div>
-    <div class="hosts-grid" id="hostsGrid">
-      <div class="loading">
-        <div class="spinner"></div> Carregando...
+    <div class="kpi-grid" id="kpiGrid" aria-label="Métricas principais">
+      <div class="loading" role="status">
+        <div class="spinner"></div>
+        <span>Carregando...</span>
       </div>
     </div>
 
+    <!-- Section: Hosts -->
     <div class="section-header" style="margin-top: 36px;">
       <div class="section-title">
-        <i class="fa-solid fa-chart-line"></i> Tráfego
+        <i class="fa-solid fa-network-wired" aria-hidden="true"></i>
+        <span>Hosts</span>
+      </div>
+      <div class="section-meta" id="hostsMeta" aria-live="polite">—</div>
+    </div>
+    <div class="hosts-grid" id="hostsGrid" aria-label="Lista de hosts">
+      <div class="loading" role="status">
+        <div class="spinner"></div>
+        <span>Carregando...</span>
       </div>
     </div>
-    <div class="charts-grid">
+
+    <!-- Section: Tráfego -->
+    <div class="section-header" style="margin-top: 36px;">
+      <div class="section-title">
+        <i class="fa-solid fa-chart-line" aria-hidden="true"></i>
+        <span>Tráfego</span>
+      </div>
+    </div>
+    <div class="charts-grid" aria-label="Gráficos de tráfego">
       <div class="chart-card">
         <div class="chart-header">
           <div class="chart-header-left">
-            <i class="fa-solid fa-calendar-week"></i>
+            <i class="fa-solid fa-calendar-week" aria-hidden="true"></i>
             <span class="chart-title">Últimos 30 dias</span>
           </div>
           <span class="chart-badge">por host</span>
         </div>
-        <canvas id="dailyChart"></canvas>
-        <div id="dailyChartEmpty" style="display:none;" class="empty-msg">
-          <i class="fa-solid fa-circle-exclamation"></i>
+        <canvas id="dailyChart" role="img" aria-label="Gráfico de tráfego dos últimos 30 dias"></canvas>
+        <div id="dailyChartEmpty" style="display:none;" class="empty-msg" role="status">
+          <i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i>
           <span>Aguardando dados (próximos ciclos do coletor)</span>
         </div>
       </div>
       <div class="chart-card">
         <div class="chart-header">
           <div class="chart-header-left">
-            <i class="fa-solid fa-calendar-days"></i>
+            <i class="fa-solid fa-calendar-days" aria-hidden="true"></i>
             <span class="chart-title">Últimos 12 meses</span>
           </div>
           <span class="chart-badge">agregado</span>
         </div>
-        <canvas id="monthlyChart"></canvas>
-        <div id="monthlyChartEmpty" style="display:none;" class="empty-msg">
-          <i class="fa-solid fa-circle-exclamation"></i>
+        <canvas id="monthlyChart" role="img" aria-label="Gráfico de tráfego dos últimos 12 meses"></canvas>
+        <div id="monthlyChartEmpty" style="display:none;" class="empty-msg" role="status">
+          <i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i>
           <span>Aguardando dados mensais</span>
         </div>
       </div>
     </div>
 
-    <div class="last-updated">
-      <i class="fa-solid fa-clock"></i>
+    <!-- Last updated -->
+    <div class="last-updated" aria-live="polite">
+      <i class="fa-solid fa-clock" aria-hidden="true"></i>
       <span id="lastUpdatedTime">—</span>
       &nbsp;·&nbsp; auto-refresh a cada 30s
     </div>
-
   </main>
 
   <script>
-    // ── State ────────────────────────────────────────────────────────────
+    // ════════════════════════════════════════════════════════════════════
+    // STATE
+    // ════════════════════════════════════════════════════════════════════
     let dailyChartInstance = null;
     let monthlyChartInstance = null;
 
@@ -123,7 +142,9 @@
     const RX_COLORS = ['#38bdf8', '#34d399', '#a78bfa'];
     const TX_COLORS = ['#f472b6', '#fb923c', '#facc15'];
 
-    // ── Init ─────────────────────────────────────────────────────────────
+    // ════════════════════════════════════════════════════════════════════
+    // INIT
+    // ════════════════════════════════════════════════════════════════════
     document.addEventListener('DOMContentLoaded', () => {
       loadUser();
       loadOverview();
@@ -138,11 +159,16 @@
       icon.style.animation = '';
     }
 
-    // ── Auth ─────────────────────────────────────────────────────────────
+    // ════════════════════════════════════════════════════════════════════
+    // AUTH
+    // ════════════════════════════════════════════════════════════════════
     async function loadUser() {
       try {
         const res = await fetch('/api/auth/me');
-        if (res.status === 401 || res.status === 403) { window.location.href = '/login'; return; }
+        if (res.status === 401 || res.status === 403) {
+          window.location.href = '/login';
+          return;
+        }
         if (!res.ok) throw new Error(`${res.status}`);
         const data = await res.json();
         document.getElementById('userBadge').innerHTML =
@@ -158,7 +184,9 @@
       }
     }
 
-    // ── Overview ─────────────────────────────────────────────────────────
+    // ════════════════════════════════════════════════════════════════════
+    // OVERVIEW
+    // ════════════════════════════════════════════════════════════════════
     async function loadOverview() {
       try {
         const res = await fetch('/api/overview');
@@ -199,7 +227,7 @@
         <div class="kpi-card">
           <div class="kpi-header">
             <div class="kpi-label">Total Recebido</div>
-            <i class="fa-solid fa-cloud-arrow-down kpi-icon"></i>
+            <i class="fa-solid fa-cloud-arrow-down kpi-icon" aria-hidden="true"></i>
           </div>
           <div class="kpi-value rx">${data.total_rx_fmt}</div>
           <div class="kpi-subtext">${formatBytes(data.total_rx)} bruto</div>
@@ -208,7 +236,7 @@
         <div class="kpi-card">
           <div class="kpi-header">
             <div class="kpi-label">Total Enviado</div>
-            <i class="fa-solid fa-cloud-arrow-up kpi-icon"></i>
+            <i class="fa-solid fa-cloud-arrow-up kpi-icon" aria-hidden="true"></i>
           </div>
           <div class="kpi-value tx">${data.total_tx_fmt}</div>
           <div class="kpi-subtext">${formatBytes(data.total_tx)} bruto</div>
@@ -217,7 +245,7 @@
         <div class="kpi-card">
           <div class="kpi-header">
             <div class="kpi-label">Total Combinado</div>
-            <i class="fa-solid fa-arrow-right-arrow-left kpi-icon"></i>
+            <i class="fa-solid fa-arrow-right-arrow-left kpi-icon" aria-hidden="true"></i>
           </div>
           <div class="kpi-value">${formatBytes((data.total_rx || 0) + (data.total_tx || 0))}</div>
           <div class="kpi-subtext">RX + TX acumulado</div>
@@ -226,16 +254,16 @@
         <div class="kpi-card">
           <div class="kpi-header">
             <div class="kpi-label">Este Mês</div>
-            <i class="fa-solid fa-calendar-days kpi-icon"></i>
+            <i class="fa-solid fa-calendar-days kpi-icon" aria-hidden="true"></i>
           </div>
           <div class="kpi-split">
             <div class="kpi-split-item">
               <div class="kpi-split-value rx">${data.month_rx_fmt}</div>
-              <div class="kpi-split-label"><i class="fa-solid fa-arrow-down" style="color:var(--rx)"></i> Down</div>
+              <div class="kpi-split-label"><i class="fa-solid fa-arrow-down" style="color:var(--rx)" aria-hidden="true"></i> Down</div>
             </div>
             <div class="kpi-split-item">
               <div class="kpi-split-value tx">${data.month_tx_fmt}</div>
-              <div class="kpi-split-label"><i class="fa-solid fa-arrow-up" style="color:var(--tx)"></i> Up</div>
+              <div class="kpi-split-label"><i class="fa-solid fa-arrow-up" style="color:var(--tx)" aria-hidden="true"></i> Up</div>
             </div>
           </div>
         </div>
@@ -243,7 +271,7 @@
         <div class="kpi-card">
           <div class="kpi-header">
             <div class="kpi-label">Hosts Online</div>
-            <i class="fa-solid fa-network-wired kpi-icon"></i>
+            <i class="fa-solid fa-network-wired kpi-icon" aria-hidden="true"></i>
           </div>
           <div class="kpi-value green">${data.hosts.filter(h => h.online).length}<span style="font-size:16px;color:var(--muted);font-weight:400">/${data.hosts.length}</span></div>
           <div class="kpi-subtext">${data.hosts.filter(h => !h.online).length} offline agora</div>
@@ -253,38 +281,45 @@
 
     function renderHosts(hosts) {
       document.getElementById('hostsGrid').innerHTML = hosts.map(h => `
-        <div class="host-card" onclick="goToHost('${h.name}')">
+        <div class="host-card" 
+             onclick="goToHost('${h.name}')" 
+             role="button" 
+             tabindex="0"
+             aria-label="Ver detalhes de ${h.display_name}">
           <div class="host-card-header">
             <div class="host-title-wrapper">
-              <i class="fa-solid fa-server host-icon"></i>
+              <i class="fa-solid fa-server host-icon" aria-hidden="true"></i>
               <div class="host-name">${h.display_name}</div>
             </div>
             <div class="host-status ${h.online ? 'online' : 'offline'}"
-                 title="${h.online ? 'Online' : 'Offline'}"></div>
+                 title="${h.online ? 'Online' : 'Offline'}"
+                 aria-label="${h.online ? 'Online' : 'Offline'}"></div>
           </div>
           <div class="host-stats">
             <div class="host-stat">
               <div class="host-stat-label">
-                <i class="fa-solid fa-arrow-down" style="color:var(--rx)"></i> Recebido
+                <i class="fa-solid fa-arrow-down" style="color:var(--rx)" aria-hidden="true"></i> Recebido
               </div>
               <div class="host-stat-value rx">${h.rx_total_fmt}</div>
             </div>
             <div class="host-stat">
               <div class="host-stat-label">
-                <i class="fa-solid fa-arrow-up" style="color:var(--tx)"></i> Enviado
+                <i class="fa-solid fa-arrow-up" style="color:var(--tx)" aria-hidden="true"></i> Enviado
               </div>
               <div class="host-stat-value tx">${h.tx_total_fmt}</div>
             </div>
           </div>
           <div class="host-card-footer">
             <span class="host-card-footer-label">Ver detalhes</span>
-            <i class="fa-solid fa-arrow-right host-card-arrow"></i>
+            <i class="fa-solid fa-arrow-right host-card-arrow" aria-hidden="true"></i>
           </div>
         </div>
       `).join('');
     }
 
-    // ── Charts ───────────────────────────────────────────────────────────
+    // ════════════════════════════════════════════════════════════════════
+    // CHARTS
+    // ════════════════════════════════════════════════════════════════════
     const baseOpts = () => ({
       responsive: true,
       maintainAspectRatio: true,
@@ -329,7 +364,6 @@
           apiFetch('/api/chart/monthly'),
         ]);
 
-        // Helper rápido para alternar exibição de container vazio
         const toggleChartContainer = (id, hasData) => {
           document.getElementById(id).style.display = hasData ? '' : 'none';
           document.getElementById(`${id}Empty`).style.display = hasData ? 'none' : 'flex';
@@ -380,7 +414,9 @@
       }
     }
 
-    // ── Helpers ──────────────────────────────────────────────────────────
+    // ════════════════════════════════════════════════════════════════════
+    // HELPERS
+    // ════════════════════════════════════════════════════════════════════
     async function apiFetch(url) {
       const res = await fetch(url);
       if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
